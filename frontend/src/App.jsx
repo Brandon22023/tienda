@@ -3,8 +3,36 @@ import { StrictMode } from 'react'
 import logoPM from './assets/IMG/logocentral.png'
 import './App.css'
 import Datosfinales from './components/datosfinales.jsx'
-
+import {useState, useEffect} from 'react'
 function App() {
+  const [mensaje, setMensaje] = useState(null)
+  const [productos, setProductos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // NUEVO efecto
+  useEffect(() => {
+    async function cargar() {
+      try {
+        const resp = await fetch('http://127.0.0.1:8000/api/inicio')
+        if (!resp.ok) {
+          const txt = await resp.text()
+          throw new Error(`Error inicio (${resp.status}) ${txt}`)
+        }
+        const json = await resp.json()
+        setMensaje(json.mensaje)
+        setProductos(json.productos)
+      } catch (e) {
+        setError(e.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    cargar()
+  }, [])
+
+
+
 
 
   return (
@@ -70,12 +98,23 @@ function App() {
 
       {/* Aquí puedes agregar el resto de tu tienda */}
       <main style={{ padding: "2rem" }}>
+        {loading && <p>Cargando...</p>}
+        {error && <p style={{color:'red'}}>Error: {error}</p>}
+        {!loading && !error && (
+          <>
+            <h2>{mensaje?.titulo}</h2>
+            <p>{mensaje?.descripcion}</p>
 
-        <h2>Bienvenido a tu tienda en línea</h2>
-        <p>¡Explora nuestros productos y disfruta de una experiencia segura!</p>
-        
-        
-        
+            <h3>Productos</h3>
+            <ul style={{listStyle:'none', padding:0}}>
+              {productos.map(p => (
+                <li key={p.id} style={{marginBottom:'0.5rem'}}>
+                  <strong>{p.nombre}</strong> - ${p.precio}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </main>
       {/* Componente de datos finales */}
       <footer className="footer">
