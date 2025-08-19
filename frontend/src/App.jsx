@@ -6,7 +6,7 @@ import Datosfinales from './components/datosfinales.jsx'
 import {useState, useEffect} from 'react'
 function App() {
   const [mensaje, setMensaje] = useState(null)
-  const [productos, setProductos] = useState([])
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -21,7 +21,6 @@ function App() {
         }
         const json = await resp.json()
         setMensaje(json.mensaje)
-        setProductos(json.productos)
       } catch (e) {
         setError(e.message)
       } finally {
@@ -105,14 +104,8 @@ function App() {
             <h2>{mensaje?.titulo}</h2>
             <p>{mensaje?.descripcion}</p>
 
-            <h3>Productos</h3>
-            <ul style={{listStyle:'none', padding:0}}>
-              {productos.map(p => (
-                <li key={p.id} style={{marginBottom:'0.5rem'}}>
-                  <strong>{p.nombre}</strong> - ${p.precio}
-                </li>
-              ))}
-            </ul>
+            
+            
           </>
         )}
       </main>

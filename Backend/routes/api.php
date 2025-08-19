@@ -5,13 +5,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/inicio', function () {
     return response()->json([
         'mensaje' => [
-            'titulo' => 'Bienvenido a tu tienda en línea (desde Laravel)',
-            'descripcion' => 'Contenido servido por la API Laravel.',
-        ],
-        'productos' => [
-            ['id'=>1,'nombre'=>'Teclado','precio'=>250],
-            ['id'=>2,'nombre'=>'Mouse','precio'=>180],
-            ['id'=>3,'nombre'=>'Monitor','precio'=>3200],
+            'titulo' => 'Bienvenidos a Electrocore',
+            'descripcion' => 'aqui se mostraran todas las ofertas del dia asi que esten
+            atentos  y no se lo pierdan',
         ]
     ]);
 });
