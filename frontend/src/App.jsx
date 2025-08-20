@@ -3,14 +3,28 @@ import { StrictMode } from 'react'
 import logoPM from './assets/IMG/logocentral.png'
 import './App.css'
 import Datosfinales from './components/datosfinales.jsx'
+import Categoria from './components/catalogo.jsx'
 import {useState, useEffect} from 'react'
 function App() {
+  // Mensaje general traído desde /api/inicio
   const [mensaje, setMensaje] = useState(null)
-
+  // Estados para la carga inicial
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+   // Estado del menú (3 líneas)
+  const [menuOpen, setMenuOpen] = useState(false)
 
-  // NUEVO efecto
+   // Controla qué vista se muestra: true = vista "inicio", false = vista "catálogo"
+  const [showInicio, setShowInicio] = useState(true)
+  //detector de scroll
+  const [showFooter, setShowFooter] = useState(false)
+  // Estado para la categoría seleccionada y los productos a mostrar
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [productosCategoria, setProductosCategoria] = useState([])
+  const [loadingCategoria, setLoadingCategoria] = useState(false)
+  const [errorCategoria, setErrorCategoria] = useState(null)
+
+ // Carga inicial (mensaje)
   useEffect(() => {
     async function cargar() {
       try {
@@ -21,6 +35,7 @@ function App() {
         }
         const json = await resp.json()
         setMensaje(json.mensaje)
+        
       } catch (e) {
         setError(e.message)
       } finally {
@@ -31,16 +46,63 @@ function App() {
   }, [])
 
 
+  useEffect(() => {
+    // Función para detectar si estamos al final del scroll
+    function handleScroll() {
+      const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 2
+      setShowFooter(atBottom)
+    }
+    window.addEventListener('scroll', handleScroll)
+    // Llama una vez al montar
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Maneja la selección de una categoría desde el componente Catalogo
+  //  - cierra el menú
+  //  - solicita /api/catalogo, filtra por categoría y guarda los productos para mostrar
+  async function handleSelectCategory(catName) {
+    setSelectedCategory(catName)
+    setShowInicio(false)         // <-- mostramos la vista de catálogo
+    setMenuOpen(false)
+    setLoadingCategoria(true)
+    setErrorCategoria(null)
+    try {
+      const resp = await fetch('http://127.0.0.1:8000/api/catalogo')
+      if (!resp.ok) {
+        const txt = await resp.text()
+        throw new Error(`Error catalogo (${resp.status}) ${txt}`)
+      }
+      const json = await resp.json()
+      // filtra en frontend por la categoría seleccionada
+      const encontrados = (json.productos || []).filter(p => p.categoria === catName)
+      setProductosCategoria(encontrados)
+    } catch (e) {
+      setErrorCategoria(e.message)
+      setProductosCategoria([])
+    } finally {
+      setLoadingCategoria(false)
+    }
+  }
+
+  // Opción rápida para volver a la vista "inicio"
+  function volverInicio() {
+    setShowInicio(true)
+    setSelectedCategory(null)
+    setProductosCategoria([])
+  }
+
+
 
 
 
   return (
-    <div>
+    <div className='app-root'>
       <header className="main-header">
       <div className="header-container">
         
-        <div className="header-left">
-          <button className="menu-btn">
+        <div className="header-left"style={{position:'relative'}} >
+          <button className="menu-btn" onClick={() => setMenuOpen(v => !v)} >
             {/* Icono de 3 líneas */}
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="4" y1="7" x2="20" y2="7"/>
@@ -48,6 +110,16 @@ function App() {
               <line x1="4" y1="17" x2="20" y2="17"/>
             </svg>
           </button>
+
+           {/* Catalogo visual (solo frontend). onSelect usa la función que solicita /api/catalogo */}
+          <Categoria
+            open={menuOpen}
+            categorias={['Memoria RAM','Laptops','Periféricos','Monitores','Almacenamiento','Audio']}
+            onSelect={(cat) => {
+              console.log('Seleccionado:', cat)
+              handleSelectCategory(cat)
+            }}
+          />
           <img
             src={logoPM}
             alt="Logo Tienda"
@@ -99,20 +171,51 @@ function App() {
       <main style={{ padding: "2rem" }}>
         {loading && <p>Cargando...</p>}
         {error && <p style={{color:'red'}}>Error: {error}</p>}
+
         {!loading && !error && (
           <>
-            <h2>{mensaje?.titulo}</h2>
-            <p>{mensaje?.descripcion}</p>
+            {/* Si showInicio = true mostramos el inicio; si false mostramos la vista de catálogo */}
+            {showInicio ? (
+              <>
+                <h2>{mensaje?.titulo}</h2>
+                <p>{mensaje?.descripcion}</p>
+                {/* botón para forzar mostrar catálogo vacío (ejemplo) */}
+                {/* <button onClick={() => setShowInicio(false)}>Ver catálogo</button> */}
+              </>
+            ) : (
+              <>
+                {/* Vista catálogo: título y botón para volver */}
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                  <h3>Catálogo: {selectedCategory}</h3>
+                  <button onClick={volverInicio} style={{ padding:'6px 10px', borderRadius:6 }}>Volver al inicio</button>
+                </div>
 
-            
-            
+                {loadingCategoria && <p>Cargando productos...</p>}
+                {errorCategoria && <p style={{color:'red'}}>Error: {errorCategoria}</p>}
+
+                {!loadingCategoria && !errorCategoria && productosCategoria.length === 0 && (
+                  <p>No hay productos en esta categoría.</p>
+                )}
+
+                <ul style={{ listStyle:'none', padding:0, display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
+                  {productosCategoria.map(p => (
+                    <li key={p.id} style={{ background:'#fff', padding:12, borderRadius:8, boxShadow:'0 8px 20px rgba(12,24,48,0.05)' }}>
+                      <div style={{ fontWeight:700 }}>{p.nombre}</div>
+                      <div style={{ color:'#666', fontSize:13 }}>{p.categoria}</div>
+                      <div style={{ marginTop:8, fontWeight:600 }}>${p.precio}</div>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
           </>
-        )}
+        )}       
       </main>
-      {/* Componente de datos finales */}
-      <footer className="footer">
-        <Datosfinales />
-      </footer>
+
+       {/* Componente de datos finales */}
+        <footer className="footer">
+          <Datosfinales />
+        </footer>
     </div>
   );
 }

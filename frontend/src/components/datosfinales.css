@@ -9,8 +9,8 @@
 }
 
 .footer {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
+  position: static;
+  left: unset; right: unset; bottom: unset;
   z-index: 50;
   width: 100%;
   color: #fff;
@@ -23,7 +23,7 @@
 /* capa aurora animada */
 .footer::before {
   content: "";
-  position: absolute; inset: -20% -10% -40% -10%;
+  
   background:
     radial-gradient(60% 80% at 8% 0%, color-mix(in oklab, var(--aurora-1) 40%, transparent) 0%, transparent 60%),
     radial-gradient(60% 80% at 92% 10%, color-mix(in oklab, var(--aurora-2) 36%, transparent) 0%, transparent 65%),
