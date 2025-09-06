@@ -4,7 +4,7 @@ import './catalogo.css'
 
 export default function Catalogo({ open = false, categorias = [], onSelect = () => {} }) {
   const defaultCats = [
-    { id: 'ram', nombre: 'Memoria RAM', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: '⚡' },
+    { id: 'ram', nombre: 'Memoria Ram', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: '⚡' },
     { id: 'laptops', nombre: 'Laptops', descripcion: 'Ultrabooks y gamers', color: '#ff9f6f', icon: '💻' },
     { id: 'perifericos', nombre: 'Periféricos', descripcion: 'Teclados, mice y más', color: '#8be3c3', icon: '⌨️' },
     { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: '🖥️' },
@@ -36,14 +36,24 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
     } else {
       setQ('')
     }
+    
   }, [open])
+  useEffect(() => {
+    if (!open) {
+      // Si el panel se cierra, quita el foco del elemento activo
+      if (document.activeElement && document.activeElement.classList.contains('catalogo-card')) {
+        document.activeElement.blur();
+      }
+    }
+  }, [open]);
+  
   // Lista filtrada por texto (nombre o descripción)
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase()
     return source.filter(c => !s || c.nombre.toLowerCase().includes(s) || c.descripcion.toLowerCase().includes(s))
   }, [source, q])
 
-  return (
+  return open ? (
     <div className={`catalogo-dropdown-wrap ${open ? 'open' : ''}`} aria-hidden={!open}>
       <div className="catalogo-panel">
         <div className="catalogo-head">
@@ -84,5 +94,5 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
         </div>
       </div>
     </div>
-  )
+  ): null;
 }
