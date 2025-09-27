@@ -70,6 +70,11 @@ function App() {
               src={logoPM}
               alt="Logo Tienda"
               className="logo"
+              role="button"
+              tabIndex={0}
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/')}
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate('/') }}
             />
           </div>
           <div className="header-center">

@@ -10,7 +10,7 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
     { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: '🖥️' },
     { id: 'almacenamiento', nombre: 'Almacenamiento', descripcion: 'SSD, HDD y NVMe', color: '#ffd36f', icon: '💾' },
     { id: 'audio', nombre: 'Audio', descripcion: 'Auriculares y parlantes', color: '#7fdcff', icon: '🎧' },
-    { id: 'juegos', nombre: 'Videojuegos', descripcion: 'Consolas y accesorios', color: '#ff7fb6', icon: '🎮' },
+    
   ]
 
   

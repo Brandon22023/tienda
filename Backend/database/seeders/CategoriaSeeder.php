@@ -13,20 +13,12 @@ class CategoriaSeeder extends Seeder
      */
     public function run(): void
     {
-        $nombres = ["Laptop", "Monitores", "Memoria Ram", "Periferico", "Almacenamiento", "Audio"];
-        //Categoria::truncate();//aqui se iniciara para añadir el coso para las categorias usaremos eloquent
-        if (empty(Categoria::all())) {
-                foreach ($nombres as $nombre) {
-                    Categoria::Create([
-                        'categoria' => $nombre
-                    ]);
-                }
-        } else {
-
-            foreach ($nombres as $nombre) {
-                Categoria::firstOrCreate([
-                    'categoria' => $nombre
-                ]);
+        $nombres = ["Laptops", "Monitores", "Memoria Ram", "Periféricos", "Almacenamiento", "Audio"];
+        
+        foreach ($nombres as $nombre) {
+            // Buscar por la columna 'categoria' para que no se repitan
+            if (! Categoria::where('categoria', $nombre)->exists()) {
+                Categoria::create(['categoria' => $nombre]);
             }
         }
         

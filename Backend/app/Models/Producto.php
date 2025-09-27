@@ -22,5 +22,6 @@ class Producto extends Model
         'stock',
         'categoria_id',
         'image_url',
+        'codigo_producto'
     ];
 }
