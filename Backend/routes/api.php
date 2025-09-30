@@ -22,11 +22,53 @@ Route::get('/catalogo', function () {
         p.descripcion, 
         p.precio, 
         p.stock, 
-        c.categoria as categoria, p.image_url from productos p
+        c.categoria as categoria, 
+        p.image_url 
+        from productos p
         join categoria c
-        on c.categoria_id = p.categoria_id;
+        on c.categoria_id = p.categoria_id
+        order by p.idproductos asc;
     ");
     return response()->json([
         'productos' => $productos,
     ]);
+});
+
+
+// Precio: mayor a menor
+Route::get('/catalogo/mayor', function (Request $request) {
+    $productos = DB::select("
+        select 
+            p.idproductos, 
+            p.nombre, 
+            p.descripcion, 
+            p.precio, 
+            p.stock, 
+            c.categoria as categoria, 
+            p.image_url 
+        from productos p
+        join categoria c
+        on c.categoria_id = p.categoria_id
+        order by p.precio desc;
+    ");
+    return response()->json(['productos' => $productos]);
+});
+
+// Precio: menor a mayor
+Route::get('/catalogo/menor', function (Request $request) {
+    $productos = DB::select("
+        select 
+            p.idproductos, 
+            p.nombre, 
+            p.descripcion, 
+            p.precio, 
+            p.stock, 
+            c.categoria as categoria, 
+            p.image_url 
+        from productos p
+        join categoria c
+        on c.categoria_id = p.categoria_id
+        order by p.precio asc;
+    ");
+    return response()->json(['productos' => $productos]);
 });

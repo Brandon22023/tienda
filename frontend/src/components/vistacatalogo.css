@@ -1,0 +1,40 @@
+.orden-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e6e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(16,24,40,0.04);
+}
+.orden-btn .caret{ font-size: 12px; opacity: 0.8; margin-left: 6px; }
+
+.orden-menu{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: #fff;
+  border: 1px solid #e6e7eb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(12,24,48,0.08);
+  padding: 6px;
+  min-width: 220px;
+  z-index: 40;
+}
+.orden-item{
+  list-style: none;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #0f172a;
+  font-size: 14px;
+}
+.orden-item:hover{ background: #f7fafc; }
+.orden-item.selected{
+  background: linear-gradient(90deg,#eef2ff,#f8fafc);
+  font-weight: 700;
+}

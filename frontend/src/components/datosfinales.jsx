@@ -78,6 +78,9 @@ function datosfinales() {
 
         <div className="footer-bottom">
           <p>© 1961 - {year} Electrocore S.A.</p>
+          <p className="disclaimer" style={{fontSize:12, color:'#a1a1a1', marginTop:6}}>
+            Imágenes usadas únicamente con fines educativos. No se emplean con fines de lucro ni implican asociación con las marcas mostradas.
+          </p>
         </div>
       </div>
     </footer>
