@@ -4,6 +4,8 @@ import './App.css'
 import Datosfinales from './components/datosfinales.jsx'
 import Categoria from './components/catalogo.jsx'
 import Vistacatalogo from './components/vistacatalogo.jsx'
+import IniciarSesion from './components/iniciar_sesion.jsx'
+import Registrarse from './components/registrarse.jsx'
 import { useState, useEffect } from 'react'
 
 function App() {
@@ -12,9 +14,35 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [cliente, setCliente] = useState(null)
   const categorias = ['Memoria Ram','Laptops','Periféricos','Monitores','Almacenamiento','Audio']
   const navigate = useNavigate()
 
+
+  useEffect(() => {
+    // cargar cliente desde localStorage (si ya inició sesión)
+    try {
+      const raw = localStorage.getItem('cliente')
+      if (raw) setCliente(JSON.parse(raw))
+    } catch (e) {
+      // no hacer nada
+    }
+  }, [])
+
+  // Nuevo: manejar clic en el botón de usuario (mostrar advertencia de cerrar sesión)
+  function handleCuentaClick() {
+    if (!cliente) {
+      navigate('/login')
+      return
+    }
+    const ok = window.confirm('¿Deseas cerrar sesión?')
+    if (ok) {
+      localStorage.removeItem('cliente')
+      // recargar para reflejar estado cerrado
+      window.location.href = '/'
+    }
+    // si el usuario cancela, no hacer nada
+  }
   useEffect(() => {
     async function cargar() {
       try {
@@ -84,10 +112,30 @@ function App() {
             </button>
           </div>
           <div className="header-right">
-            <button className="icon-btn">
-              <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="11" cy="8" r="4"/><path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
-              <span>Mi Cuenta</span>
-            </button>
+
+
+            {cliente ? (
+              <button
+                className="icon-btn"
+                onClick={handleCuentaClick}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleCuentaClick() }}
+                title={cliente.correo}
+              >
+                <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="11" cy="8" r="4"/><path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+                <span>{cliente.nombre}</span>
+              </button>
+            ) : (
+              <button
+                className="icon-btn"
+                onClick={() => navigate('/login')}
+                onKeyDown={(e) => { if (e.key === 'Enter') navigate('/login') }}
+              >
+                <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="11" cy="8" r="4"/><path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+                <span>Mi Cuenta</span>
+              </button>
+            )}
+
+
             <button className="icon-btn">
               <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/></svg>
               <span>Favoritos</span>
@@ -127,6 +175,8 @@ function App() {
           </main>
         } />
         <Route path="/:categoriaId" element={<Vistacatalogo categorias={categorias} />} />
+        <Route path="/login" element={<IniciarSesion />} />
+        <Route path="/register" element={<Registrarse />} />
       </Routes>
 
       <footer className="footer">

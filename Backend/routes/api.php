@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\Producto;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\RegisterController;
 Route::get('/inicio', function () {
     return response()->json([
         'mensaje' => [
@@ -72,3 +74,6 @@ Route::get('/catalogo/menor', function (Request $request) {
     ");
     return response()->json(['productos' => $productos]);
 });
+
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [\App\Http\Controllers\LoginController::class, 'login']);
