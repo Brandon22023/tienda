@@ -6,6 +6,7 @@ import Categoria from './components/catalogo.jsx'
 import Vistacatalogo from './components/vistacatalogo.jsx'
 import IniciarSesion from './components/iniciar_sesion.jsx'
 import Registrarse from './components/registrarse.jsx'
+import Carrito from './components/carrito.jsx'
 import { useState, useEffect } from 'react'
 
 function App() {
@@ -140,7 +141,9 @@ function App() {
               <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/></svg>
               <span>Favoritos</span>
             </button>
-            <button className="icon-btn">
+            <button className="icon-btn"
+              onClick={() => navigate('/carrito')}
+              onKeyDown={(e) => { if (e.key === 'Enter') navigate('/carrito') }}>
               <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="9" cy="19" r="1"/><circle cx="17" cy="19" r="1"/><path d="M5 6h16l-1.5 9h-13z"/><path d="M7 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
               <span>Carrito</span>
             </button>
@@ -177,6 +180,7 @@ function App() {
         <Route path="/:categoriaId" element={<Vistacatalogo categorias={categorias} />} />
         <Route path="/login" element={<IniciarSesion />} />
         <Route path="/register" element={<Registrarse />} />
+        <Route path="/carrito" element={<Carrito/>} />
       </Routes>
 
       <footer className="footer">
