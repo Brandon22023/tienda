@@ -38,3 +38,68 @@
   background: linear-gradient(90deg,#eef2ff,#f8fafc);
   font-weight: 700;
 }
+
+.btn-agregar{
+  display:inline-block;
+  margin:10px 0;
+  background: transparent;
+  border: 1px solid rgba(16,24,40,0.08);
+  padding:8px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:600;
+  color:#0f172a;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-agregar:hover{ transform: translateY(-4px); box-shadow: 0 10px 24px rgba(12,24,48,0.06); }
+
+/* Modal cantidad */
+.qty-modal-overlay{
+  position:fixed;
+  inset:0;
+  background: rgba(10,12,20,0.45);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1400;
+  padding:18px;
+}
+.qty-modal{
+  width:100%;
+  max-width:720px;
+  background:#fff;
+  border-radius:12px;
+  padding:18px;
+  box-shadow:0 22px 60px rgba(12,24,48,0.16);
+  color:#122033;
+}
+.qty-modal h4{ margin:0 0 12px 0; font-size:1.05rem; }
+.modal-row{ display:flex; gap:14px; align-items:center; }
+.modal-thumb img{ width:96px; height:auto; border-radius:8px; object-fit:cover; }
+.modal-info{ flex:1; }
+.modal-name{ font-weight:700; margin-bottom:6px; }
+.modal-price{ color:#5f6b7a; margin-bottom:8px; }
+.qty-control{ display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+.qty-control button{
+  width:38px; height:36px; border-radius:8px; border:1px solid rgba(16,24,40,0.06); background:#fff; cursor:pointer; font-size:18px;
+}
+.qty-control input{
+  width:72px; padding:8px; border-radius:8px; border:1px solid rgba(16,24,40,0.06); text-align:center;
+}
+
+/* acciones modal */
+.modal-actions{ display:flex; gap:10px; }
+.btn-confirm{
+  background: linear-gradient(90deg,#3f63d6,#6ea0ff);
+  color:#fff; border:none; padding:10px 16px; border-radius:10px; cursor:pointer; font-weight:700;
+}
+.btn-cancel{
+  background:transparent; border:1px solid rgba(16,24,40,0.06); padding:10px 14px; border-radius:10px; cursor:pointer;
+}
+
+/* responsive */
+@media (max-width:680px){
+  .modal-row{ flex-direction:column; text-align:center; }
+  .modal-thumb img{ width:120px; }
+  .qty-control input{ width:60px; }
+}

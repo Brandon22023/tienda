@@ -80,6 +80,7 @@ body {
   cursor: pointer;
   font-size: 1rem;
   transition: color 0.2s;
+  position: relative;
 }
 .icon-btn:hover {
   color: #4b70cf;
@@ -152,4 +153,73 @@ html, body {
   box-sizing: border-box;
   width: 100%;
   overflow-x: hidden;
+}
+
+.cart-badge{
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#3f63d6,#6ea0ff);
+  color: #fff;
+  font-weight:700;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(63,99,214,0.18);
+  transform-origin: center;
+  transform: scale(1);
+  transition: transform .18s cubic-bezier(.2,.9,.3,1), box-shadow .18s ease;
+  pointer-events: none;
+  line-height: 1;
+}
+
+/* pulso cuando cambia la cantidad */
+.cart-badge.pop{
+  animation: badgePop .38s cubic-bezier(.2,.9,.3,1);
+}
+
+@keyframes badgePop {
+  0% { transform: scale(.6); box-shadow: 0 6px 14px rgba(63,99,214,0.10); opacity:0.0; }
+  40% { transform: scale(1.12); box-shadow: 0 10px 30px rgba(63,99,214,0.18); opacity:1; }
+  100% { transform: scale(1); box-shadow: 0 6px 18px rgba(63,99,214,0.14); opacity:1; }
+}
+
+/* variante pequeña para cuando está vacío (no mostrar número, solo ocultar) */
+.cart-badge:empty { display: none; }
+
+.icon-btn.cart-btn .cart-icon-svg {
+  width: 36px;   /* ajustar: 36, 42, 48... */
+  height: 36px;
+  display: block;
+}
+
+/* reajusta la posición de la burbuja si aumenta el icono */
+.icon-btn.cart-btn .cart-badge{
+  top: -6px; /* ajustar si es necesario */
+  right: -4px;
+}
+.header-right .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px; /* ajustar si tu header es más alto/bajo */
+  padding: 6px 10px;
+  box-sizing: border-box;
+}
+
+.header-right .icon-btn svg,
+.header-right .icon-btn .cart-icon-svg {
+  display: block;
+  width: 32px;   /* prueba 32 / 36 / 42 según prefieras */
+  height: 32px;
+
+}
+.icon-btn.cart-btn {
+  padding-right: 12px; /* espacio para el badge */
+  position: relative; /* badge usa absolute */
 }

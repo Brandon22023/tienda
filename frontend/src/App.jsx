@@ -18,7 +18,38 @@ function App() {
   const [cliente, setCliente] = useState(null)
   const categorias = ['Memoria Ram','Laptops','Periféricos','Monitores','Almacenamiento','Audio']
   const navigate = useNavigate()
+  
+  const [cartCount, setCartCount] = useState(0)
+ const [badgePulse, setBadgePulse] = useState(false)
 
+ // lee el carrito y suma cantidades
+ function readCartCount() {
+    try {
+      const raw = localStorage.getItem('cart')
+      const arr = raw ? JSON.parse(raw) : []
+      const newCount = Array.isArray(arr) ? arr.length : 0
+
+      if (newCount !== cartCount) {
+        setCartCount(newCount)
+        if (newCount > 0) {
+          setBadgePulse(true)
+          setTimeout(() => setBadgePulse(false), 420)
+        }
+      } else {
+        // mantener estado sin pulso si no cambió
+        setCartCount(newCount)
+      }
+    } catch {
+      setCartCount(0)
+    }
+  }
+
+ useEffect(() => {
+   readCartCount()
+   function onUpdate() { readCartCount() }
+   window.addEventListener('cart-updated', onUpdate)
+   return () => window.removeEventListener('cart-updated', onUpdate)
+ }, [])
 
   useEffect(() => {
     // cargar cliente desde localStorage (si ya inició sesión)
@@ -122,7 +153,9 @@ function App() {
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCuentaClick() }}
                 title={cliente.correo}
               >
-                <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="11" cy="8" r="4"/><path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+                <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="8" r="5"/>
+              <path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+              </svg>
                 <span>{cliente.nombre}</span>
               </button>
             ) : (
@@ -131,21 +164,29 @@ function App() {
                 onClick={() => navigate('/login')}
                 onKeyDown={(e) => { if (e.key === 'Enter') navigate('/login') }}
               >
-                <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="11" cy="8" r="4"/><path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/></svg>
+              <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg"><circle cx="11" cy="8" r="5"/>
+              <path d="M3 19c0-3.3 3.6-6 8-6s8 2.7 8 6"/>
+              </svg>
                 <span>Mi Cuenta</span>
               </button>
             )}
 
 
             <button className="icon-btn">
-              <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/></svg>
+              <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/>
+              </svg>
               <span>Favoritos</span>
             </button>
-            <button className="icon-btn"
+            <button className="icon-btn cart-btn"
               onClick={() => navigate('/carrito')}
               onKeyDown={(e) => { if (e.key === 'Enter') navigate('/carrito') }}>
-              <svg width="22" height="22" fill="none" stroke=" #4b70cf" strokeWidth="2"><circle cx="9" cy="19" r="1"/><circle cx="17" cy="19" r="1"/><path d="M5 6h16l-1.5 9h-13z"/><path d="M7 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              <span>Carrito</span>
+              <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
+               <circle cx="9" cy="19" r="1"/><circle cx="17" cy="19" r="1"/><path d="M5 6h16l-1.5 9h-13z"/><path d="M7 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              {/* contador animado */}
+              <span className={`cart-badge ${badgePulse ? 'pop' : ''}`} aria-live="polite" aria-atomic="true">{cartCount > 0 ? cartCount : ''}</span>
+              <span>  </span>
             </button>
           </div>
         </div>

@@ -63,6 +63,57 @@ export default function vistacatalogo({ categorias }) {
     { value: 'mayor', label: 'Mayor a menor' },
     { value: 'menor', label: 'Menor a mayor' },
   ];
+  // modal: estado y helpers para elegir cantidad antes de agregar al carrito
+  const [modalOpen, setModalOpen] = useState(false)
+  const [modalProduct, setModalProduct] = useState(null)
+  const [modalQty, setModalQty] = useState(1)
+
+ // alias usado por los botones "Agregar al carrito" (abre el modal)
+ function agregarAlCarrito(product) {
+   setModalProduct(product)
+   setModalQty(1)
+   setModalOpen(true)
+ }
+  //para agregar al carrito
+  // Abre modal para elegir cantidad
+  function openQtyModal(product) {
+    setModalProduct(product)
+    setModalQty(1)
+    setModalOpen(true)
+  }
+
+  // Agrega al carrito en localStorage y notifica a la app
+  function addToCart(product, qty) {
+    try {
+      const key = 'cart'
+      const raw = localStorage.getItem(key)
+      const cart = raw ? JSON.parse(raw) : []
+      const idx = cart.findIndex(i => i.idproductos === product.idproductos)
+      if (idx >= 0) {
+        cart[idx].cantidad = (cart[idx].cantidad || 0) + qty
+      } else {
+        cart.push({
+          idproductos: product.idproductos,
+          nombre: product.nombre,
+          precio: Number(product.precio) || 0,
+          image_url: product.image_url,
+          cantidad: qty
+        })
+      }
+      localStorage.setItem(key, JSON.stringify(cart))
+      // evento para que otros componentes (Carrito) recarguen
+      window.dispatchEvent(new Event('cart-updated'))
+    } catch (e) {
+      console.error('Error guardando carrito', e)
+    }
+  }
+
+  function confirmAdd() {
+    if (!modalProduct) return
+    addToCart(modalProduct, Number(modalQty || 1))
+    setModalOpen(false)
+  }
+
 
   return (
     <main style={{ padding: "2rem" }}>
@@ -123,6 +174,12 @@ export default function vistacatalogo({ categorias }) {
               alt={p.nombre}
               style={{ width: '200px', height: 'auto', borderRadius: 8 }}
             />
+            <button
+              className="btn-agregar"
+              onClick={() => agregarAlCarrito(p)}
+            >
+              Agregar al carrito
+            </button>
             <div style={{ fontWeight:700 }}>{p.nombre}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.categoria}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.descripcion}</div>
@@ -130,6 +187,32 @@ export default function vistacatalogo({ categorias }) {
           </li>
         ))}
       </ul>
+      {/* Modal de la cantidad del producto */}
+      {modalOpen && (
+        <div className="qty-modal-overlay" role="dialog" aria-modal="true" onClick={() => setModalOpen(false)}>
+          <div className="qty-modal" onClick={(e) => e.stopPropagation()}>
+            <h4>Añadir al carrito</h4>
+            <div className="modal-row">
+              <div className="modal-thumb">
+                <img src={modalProduct.image_url} alt={modalProduct.nombre} />
+              </div>
+              <div className="modal-info">
+                <div className="modal-name">{modalProduct.nombre}</div>
+                <div className="modal-price">${modalProduct.precio}</div>
+                <div className="qty-control">
+                  <button onClick={() => setModalQty(q => Math.max(1, q - 1))}>−</button>
+                  <input type="number" min="1" value={modalQty} onChange={(e) => setModalQty(Math.max(1, Number(e.target.value || 1)))} />
+                  <button onClick={() => setModalQty(q => q + 1)}>+</button>
+                </div>
+                <div className="modal-actions">
+                  <button className="btn-confirm" onClick={confirmAdd}>Agregar</button>
+                  <button className="btn-cancel" onClick={() => setModalOpen(false)}>Cancelar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
