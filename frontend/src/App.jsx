@@ -7,6 +7,7 @@ import Vistacatalogo from './components/vistacatalogo.jsx'
 import IniciarSesion from './components/iniciar_sesion.jsx'
 import Registrarse from './components/registrarse.jsx'
 import Carrito from './components/carrito.jsx'
+import Pedido from './components/pedidos.jsx'
 import { useState, useEffect } from 'react'
 
 function App() {
@@ -222,6 +223,7 @@ function App() {
         <Route path="/login" element={<IniciarSesion />} />
         <Route path="/register" element={<Registrarse />} />
         <Route path="/carrito" element={<Carrito/>} />
+        <Route path="/pedidos" element={<Pedido />} />
       </Routes>
 
       <footer className="footer">

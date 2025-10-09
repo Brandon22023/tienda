@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './carrito.css'
@@ -7,6 +6,7 @@ export default function Carrito() {
   const navigate = useNavigate()
   const [ready, setReady] = useState(false)
   const [cart, setCart] = useState([])
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
   useEffect(() => {
     const t = setTimeout(() => setReady(true), 20)
     return () => clearTimeout(t)
@@ -52,6 +52,39 @@ export default function Carrito() {
   const total = cart.reduce((s, it) => s + (Number(it.precio || 0) * Number(it.cantidad || 1)), 0)
 
   if (!ready) return null
+
+ 
+
+
+  function handleContinue() {
+    try {
+      const raw = localStorage.getItem('cliente')
+      const cliente = raw ? JSON.parse(raw) : null
+      if (cliente) {
+        // ya inició sesión -> ir directo a la página de datos del pedido
+        navigate('/pedidos')
+        return
+      }
+      setShowLoginPrompt(true)
+    } catch (e) {
+      // en caso de error, permitir continuar como invitado
+      navigate('/pedidos')
+    }
+  }
+
+   function chooseLogin() {
+   setShowLoginPrompt(false)
+   navigate('/login')
+ }
+
+ function chooseGuest() {
+   setShowLoginPrompt(false)
+   navigate('/pedidos')
+ }
+
+ function closePrompt() {
+   setShowLoginPrompt(false)
+ }
 
 return (
     <div className={`cart-page simple enter`} role="region" aria-label="Carrito">
@@ -115,12 +148,26 @@ return (
               </div>
 
               <div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
-                <button className="btn-cart-blue" onClick={() => navigate('/checkout')}>Continuar</button>
+                <button className="btn-cart-blue" onClick={handleContinue}>Continuar</button>
               </div>
             </div>
           )}
         </article>
       </main>
+
+      {showLoginPrompt && (
+       <div className="confirm-modal" role="dialog" aria-modal="true" aria-label="Iniciar sesión o continuar como invitado">
+         <div className="confirm-card">
+           <h3>¿Deseas iniciar sesión o continuar como invitado?</h3>
+           <p>Si inicias sesión recuperaremos tus datos automáticamente. Si prefieres, puedes continuar como invitado y proporcionar los datos para el pedido.</p>
+           <div className="confirm-actions">
+             <button className="btn-secondary" onClick={closePrompt}>Cancelar</button>
+             <button className="btn-outline" onClick={chooseGuest}>Continuar como invitado</button>
+             <button className="btn-primary" onClick={chooseLogin}>Iniciar sesión</button>
+           </div>
+         </div>
+       </div>
+     )}
     </div>
   )
 }

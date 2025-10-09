@@ -1,0 +1,217 @@
+
+:root{
+  --accent-1: #4b70cf;
+  --accent-2: #6ea0ff;
+  --muted: #6b6b6b;
+  --card-bg: rgba(255,255,255,0.98);
+  --glass: rgba(250,252,255,0.7);
+}
+
+/* página */
+.register-page{
+  min-height: calc(100vh - 160px);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:56px 20px;
+  background: linear-gradient(180deg, rgba(75,112,207,0.03) 0%, rgba(110,160,255,0.01) 100%);
+  -webkit-font-smoothing:antialiased;
+  transition: background .25s ease;
+}
+
+/* tarjeta principal */
+.register-card{
+  position:relative;
+  width:100%;
+  max-width:820px;
+  background: var(--card-bg);
+  border-radius:16px;
+  box-shadow: 0 22px 60px rgba(18,32,60,0.06);
+  padding:34px;
+  overflow:hidden;
+  border: 1px solid rgba(75,112,207,0.06);
+  backdrop-filter: blur(6px);
+}
+
+/* acento decorativo sutil (se muestra detrás del card) */
+.card-accent{
+  position:absolute;
+  right:-80px;
+  top:-60px;
+  width:220px;
+  height:220px;
+  background: radial-gradient(circle at 30% 30%, rgba(75,112,207,0.14), rgba(110,160,255,0.06) 60%, transparent 72%);
+  transform: rotate(16deg);
+  pointer-events:none;
+  filter: blur(12px);
+}
+
+/* cabecera con icono y texto */
+.brand{
+  display:flex;
+  justify-content:center;
+  margin-top:-8px;
+  margin-bottom:12px;
+}
+.brand-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+  max-width:760px;
+  padding:12px 16px;
+  border-radius:12px;
+  background: linear-gradient(90deg, rgba(110,160,255,0.03), rgba(79,120,210,0.01));
+  box-shadow: 0 10px 26px rgba(16,24,40,0.03);
+  border: 1px solid rgba(75,112,207,0.04);
+}
+
+/* icono renovado */
+.brand-icon{
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background: linear-gradient(180deg,#fff,#fbfdff);
+  box-shadow: 0 8px 22px rgba(75,112,207,0.06);
+  padding:6px;
+}
+
+/* texto de cabecera */
+.brand-text{ display:flex; flex-direction:column; gap:4px; }
+.brand-text h2{
+  margin:0;
+  font-size:1.35rem;
+  color:#122033;
+  letter-spacing:0.2px;
+  font-weight:800;
+  text-align:left;
+}
+.brand-text .sub{
+  margin:0;
+  color:var(--muted);
+  font-size:0.95rem;
+}
+
+/* decorativo debajo del título */
+.brand-text h2::after{
+  content: '';
+  display:block;
+  width:56px;
+  height:4px;
+  border-radius:3px;
+  margin-top:8px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+}
+
+/* formulario */
+.register-form{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+  margin-top:8px;
+}
+
+/* campos */
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  font-size:0.92rem;
+  color:var(--muted);
+}
+.field-label{ font-weight:600; color:#33415a; font-size:0.92rem; }
+
+/* inputs estilizados */
+.input{
+  height:48px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid rgba(20,30,60,0.06);
+  background: linear-gradient(180deg, #ffffff, #fbfdff);
+  outline:none;
+  transition: box-shadow .18s cubic-bezier(.2,.8,.2,1), border-color .14s ease, transform .06s;
+  font-size:1rem;
+  color:#223;
+  box-shadow: 0 8px 20px rgba(30,40,80,0.03);
+}
+.input::placeholder{ color:#b9c6df; }
+.input:focus{ border-color: var(--accent-1); box-shadow: 0 12px 36px rgba(75,112,207,0.12); transform: translateY(-1px); }
+
+/* textarea */
+textarea.input{ min-height:120px; padding:12px; resize:vertical; }
+
+/* botones */
+.btn-primary{
+  grid-column: 1 / 3;
+  margin-top:12px;
+  height:52px;
+  border-radius:12px;
+  border: none;
+  color: white;
+  font-weight:700;
+  font-size:1rem;
+  cursor:pointer;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  box-shadow: 0 14px 36px rgba(75,112,207,0.14);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.btn-primary:hover{ transform: translateY(-3px); box-shadow: 0 18px 44px rgba(75,112,207,0.18); }
+
+/* secundarios */
+.btn-link{ background:none; border:none; color:var(--accent-1); cursor:pointer; font-weight:700; padding:6px 8px; }
+.btn-outline{ border:1px solid rgba(75,112,207,0.12); background:transparent; color:var(--accent-1); padding:8px 12px; border-radius:10px; cursor:pointer; }
+
+/* mapa y búsqueda */
+.maps-input-wrap { position:relative; display:flex; gap:8px; align-items:center; }
+.maps-mi-ubicacion-btn{ border:1px solid rgba(75,112,207,0.12); background:#fff; color:var(--accent-1); padding:8px 12px; border-radius:10px; cursor:pointer; }
+
+/* estilos Leaflet refinados */
+.leaflet-container { border-radius: 12px; box-shadow: 0 10px 30px rgba(12,20,36,0.06); }
+.leaflet-control-zoom a{
+  background:#fff;
+  border-radius:10px;
+  box-shadow:0 8px 20px rgba(16,24,40,0.06);
+  color:#2b3b52;
+  width:36px;
+  height:36px;
+  line-height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.leaflet-control-attribution{ font-size:11px; opacity:0.8; }
+
+/* dropdown de resultados */
+.maps-search-results {
+  position: absolute;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 1400;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 10px;
+  max-height: 260px;
+  overflow: auto;
+  padding: 6px;
+  list-style: none;
+  box-shadow: 0 14px 40px rgba(12,20,36,0.06);
+}
+.maps-search-results li{ padding: 10px 12px; cursor:pointer; border-radius:8px; }
+.maps-search-results li:hover{ background:#f6f9ff; }
+
+/* pequeños ajustes de espaciado */
+.register-card .register-form .field{ margin-bottom:6px; }
+.register-card .register-form .input{ min-height:48px; padding:12px 14px; border-radius:12px; }
+
+/* responsive */
+@media (max-width:920px){
+  .register-card{ padding:20px; }
+  .register-form{ grid-template-columns: 1fr; }
+  .btn-primary{ grid-column: 1 / 2; }
+  .brand-text h2{ font-size:1.25rem; }
+}

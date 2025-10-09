@@ -247,3 +247,41 @@
   .cart-item-total{ width:100%; text-align:left; }
   .cart-summary{ justify-content:space-between; }
 }
+
+/* Modal de confirmación para avanzar al checkout */
+.confirm-modal{
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12,20,36,0.45);
+  z-index: 1200;
+  padding: 24px;
+}
+.confirm-card{
+  width: 100%;
+  max-width: 640px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 30px 80px rgba(12,20,36,0.3);
+  border: 1px solid rgba(16,24,40,0.05);
+}
+.confirm-card h3{ margin: 0 0 8px 0; color:#122033; }
+.confirm-card p{ margin: 0 0 16px 0; color:#5f6b7a; }
+.confirm-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
+.confirm-actions .btn-primary{
+  background: linear-gradient(90deg,#3f63d6,#6ea0ff);
+  color:#fff; padding:10px 14px; border-radius:10px; border:0; cursor:pointer;
+}
+.confirm-actions .btn-outline{
+  background: transparent; border:1px solid rgba(63,99,214,0.12); padding:10px 14px; border-radius:10px; cursor:pointer; color:#3f63d6;
+}
+.confirm-actions .btn-secondary{
+  background: #f3f4f6; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; color:#33415a;
+}
+@media (max-width:520px){
+  .confirm-card{ padding:16px; }
+  .confirm-actions{ flex-direction:column-reverse; gap:8px; }
+}

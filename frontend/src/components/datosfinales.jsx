@@ -7,21 +7,7 @@ function datosfinales() {
     <footer className="footer aurora-footer" role="contentinfo">
       <div className="footer-inner">
         {/* CTA superior */}
-        <section className="footer-cta" aria-label="Suscripción y confianza">
-          <div className="cta-copy">
-            <h3>Recibe ofertas exclusivas</h3>
-            <p>Promos, lanzamientos y tips para sacar el máximo a tu tecnología.</p>
-          </div>
-          <form className="cta-form" onSubmit={(e) => e.preventDefault()}>
-            <input type="email" placeholder="Tu correo electrónico" aria-label="Correo" required />
-            <button type="submit">Registrate</button>
-          </form>
-          <ul className="trust-badges" aria-label="Beneficios">
-            <li>Pago seguro</li>
-            <li>Envíos a todos el país</li>
-            <li>Garantía 12 meses</li>
-          </ul>
-        </section>
+        
 
         {/* Contenido principal */}
         <div className="footer-content">
