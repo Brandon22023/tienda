@@ -8,11 +8,14 @@ import IniciarSesion from './components/iniciar_sesion.jsx'
 import Registrarse from './components/registrarse.jsx'
 import Carrito from './components/carrito.jsx'
 import Pedido from './components/pedidos.jsx'
+import Pago from './components/pago.jsx'
+import Resumen from './components/resumen.jsx'
 import { useState, useEffect } from 'react'
 
 function App() {
   // Mensaje general traído desde /api/inicio
   const [mensaje, setMensaje] = useState(null)
+  const [productosInicio, setProductosInicio] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -42,6 +45,29 @@ function App() {
       }
     } catch {
       setCartCount(0)
+    }
+  }
+  function addToCart(product, qty = 1) {
+    try {
+      const key = 'cart'
+      const raw = localStorage.getItem(key)
+      const cart = raw ? JSON.parse(raw) : []
+      const idx = cart.findIndex(i => i.idproductos === product.idproductos)
+      if (idx >= 0) {
+        cart[idx].cantidad = (Number(cart[idx].cantidad || 0) + Number(qty))
+      } else {
+        cart.push({
+          idproductos: product.idproductos,
+          nombre: product.nombre,
+          precio: Number(product.precio) || 0,
+          image_url: product.image_url,
+          cantidad: Number(qty)
+        })
+      }
+      localStorage.setItem(key, JSON.stringify(cart))
+      window.dispatchEvent(new Event('cart-updated'))
+    } catch (e) {
+      console.error('Error guardando carrito', e)
     }
   }
 
@@ -85,6 +111,7 @@ function App() {
           throw new Error(`Error inicio (${resp.status}) ${txt}`)
         }
         const json = await resp.json()
+        setProductosInicio(Array.isArray(json.productos) ? json.productos : [])
         setMensaje(json.mensaje)
       } catch (e) {
         setError(e.message)
@@ -105,6 +132,44 @@ function App() {
     handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+  //para las promos
+  function Carousel({ images = [], interval = 4000 }) {
+  const [index, setIndex] = useState(0)
+
+  useEffect(() => {
+    if (!images.length) return
+    const t = setInterval(() => setIndex(i => (i + 1) % images.length), interval)
+    return () => clearInterval(t)
+  }, [images, interval])
+
+  if (!images.length) return null
+
+  return (
+    <div className="carousel" aria-roledescription="carousel">
+      <div className="carousel-track" style={{ transform: `translateX(-${index * 100}%)` }}>
+        {images.map((src, i) => (
+          <img key={i} src={src} alt={`Slide ${i + 1}`} className="carousel-image" />
+        ))}
+      </div>
+
+      <div className="carousel-controls">
+        <button type="button" aria-label="Anterior" onClick={() => setIndex((index - 1 + images.length) % images.length)}>&lt;</button>
+        <button type="button" aria-label="Siguiente" onClick={() => setIndex((index + 1) % images.length)}>&gt;</button>
+      </div>
+
+      <div className="carousel-indicators" role="tablist" aria-label="Indicadores del carrusel">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            className={i === index ? 'active' : ''}
+            aria-label={`Ir al slide ${i + 1}`}
+            onClick={() => setIndex(i)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+ }
 
   return (
     <div className='app-root'>
@@ -194,27 +259,37 @@ function App() {
       </header>
 
       <nav className="nav-secundaria">
-        <a href="#">Ofertas</a>
-        <a href="#">Ubicaciones</a>
-        <a href="#">Marcas</a>
-        <a href="#">Blog</a>
-        <a href="#">Mayoreo</a>
-        <a href="#">Empresa</a>
-        <a href="#">Soporte</a>
-        <a href="#">Políticas</a>
+        <a href="#">Descuentos</a>
         <a href="#">Sugerencias</a>
-        <a href="#">Empleos</a>
+        <a href="#">Ubicaciones</a>
+        <a href="#">Información</a>
+        <a href="#">Políticas</a>
+        <a href="#">Trabajo</a>
+        <a href="#">Soporte</a>
       </nav>
 
       <Routes>
         <Route path="/" element={
           <main style={{ padding: "2rem" }}>
+            <Carousel images={['/promo1.jpg','/promo2.jpg','/promo3.jpg']} interval={4500} />
             {loading && <p>Cargando...</p>}
             {error && <p style={{color:'red'}}>Error: {error}</p>}
             {!loading && !error && (
               <>
                 <h2>{mensaje?.titulo}</h2>
-                <p>{mensaje?.descripcion}</p>
+                <div className="inicio-grid">
+                  {productosInicio.map(p => (
+                    <article key={p.idproductos} className="producto-card">
+                      <img src={p.image_url} alt={p.nombre} />
+                      <div className="producto-info">
+                        <div className="producto-nombre">{p.nombre}</div>
+                        <div className="producto-categoria">{p.categoria}</div>
+                        <div className="producto-precio">Q {Number(p.precio).toFixed(2)}</div>
+                        <button className="producto-add" onClick={() => addToCart(p, 1)}>Agregar al carrito</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               </>
             )}
           </main>
@@ -224,6 +299,8 @@ function App() {
         <Route path="/register" element={<Registrarse />} />
         <Route path="/carrito" element={<Carrito/>} />
         <Route path="/pedidos" element={<Pedido />} />
+        <Route path="/pago" element={<Pago />} />
+        <Route path="/resumen" element={<Resumen />} />
       </Routes>
 
       <footer className="footer">

@@ -34,11 +34,30 @@ export default function vistacatalogo({ categorias }) {
         
         
         const json = await resp.json();
-        // Filtra por categoría normalizada
-        const encontrados = (json.productos || []).filter(
-          p => p.categoria.toLowerCase().replace(/\s/g, '-') === categoriaId
-        );
-        setProductosCategoria(encontrados);
+        // helper para normalizar strings (quita tildes, lowerCase, convierte a slugs)
+       function normalizeSlug(s) {
+         return String(s || '')
+           .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar acentos
+           .toLowerCase()
+           .replace(/[^a-z0-9]+/g, '-') // reemplazar separadores por '-'
+           .replace(/(^-|-$)/g, '')
+       }
+
+       console.log('API /catalogo productos recibidos:', (json.productos||[]).length)
+       const all = Array.isArray(json.productos) ? json.productos : []
+
+       // Intento 1: coincidencia exacta con slug
+       let encontrados = all.filter(p => normalizeSlug(p.categoria) === normalizeSlug(categoriaId))
+       // Intento 2: si no hay resultados, probar contains (p.ej. "memoria" en "memoria ram")
+       if (encontrados.length === 0) {
+         encontrados = all.filter(p => normalizeSlug(p.categoria).includes(normalizeSlug(categoriaId)))
+       }
+       // Fallback: si aún no hay nada, mostrar todos para ver qué trae la API (útil en pruebas)
+       if (encontrados.length === 0) {
+         console.warn('No se encontraron productos para la categoría, mostrando todos (revisa categorías en DB/API)')
+         encontrados = all
+       }
+       setProductosCategoria(encontrados);
       } catch (e) {
         setErrorCategoria(e.message);
         setProductosCategoria([]);
@@ -116,11 +135,9 @@ export default function vistacatalogo({ categorias }) {
 
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+    <main className="vc-main">
+      <div className="vc-header">
         <h3>Catálogo: {categoriaId.replace(/-/g, ' ')}</h3>
-
-
         <div ref={menuRef} style={{ position: 'relative' }}>
           <button
             type="button"
@@ -134,19 +151,13 @@ export default function vistacatalogo({ categorias }) {
           </button>
 
           {menuOpen && (
-            <ul className="orden-menu" role="menu" aria-label="Opciones de orden">
+            <ul className="orden-menu" role="menu" aria-label="Ordenar productos">
               {opciones.map(opt => (
                 <li
                   key={opt.value}
-                  role="menuitemradio"
-                  aria-checked={selected === opt.value}
+                  role="menuitem"
                   className={`orden-item ${selected === opt.value ? 'selected' : ''}`}
-                  onClick={() => {
-                    // solo UI: marcar selección visual, no realiza orden real
-                    setSelected(opt.value)
-                    // no cerrar o cerrar según preferencia; aquí cerramos
-                    setMenuOpen(false)
-                  }}
+                  onClick={() => { setSelected(opt.value); setMenuOpen(false); }}
                 >
                   {opt.label}
                 </li>
@@ -166,20 +177,11 @@ export default function vistacatalogo({ categorias }) {
       {!loadingCategoria && !errorCategoria && productosCategoria.length === 0 && (
         <p>No hay productos en esta categoría.</p>
       )}
-      <ul style={{ listStyle:'none', padding:0, display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:12 }}>
+      <ul className="vc-grid">
         {productosCategoria.map(p => (
-          <li key={p.idproductos} style={{ background:'#fff', padding:12, borderRadius:8, boxShadow:'0 8px 20px rgba(12,24,48,0.05)' }}>
-            <img
-              src={p.image_url}
-              alt={p.nombre}
-              style={{ width: '200px', height: 'auto', borderRadius: 8 }}
-            />
-            <button
-              className="btn-agregar"
-              onClick={() => agregarAlCarrito(p)}
-            >
-              Agregar al carrito
-            </button>
+          <li key={p.idproductos} className="vc-item">
+            <img src={p.image_url} alt={p.nombre} className="vc-list-img" />
+            <button className="btn-agregar" onClick={() => agregarAlCarrito(p)}>Agregar al carrito</button>
             <div style={{ fontWeight:700 }}>{p.nombre}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.categoria}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.descripcion}</div>

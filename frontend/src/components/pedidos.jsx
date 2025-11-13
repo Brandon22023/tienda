@@ -18,7 +18,7 @@ export default function DatosPedido() {
         const c = JSON.parse(raw)
         if (c.nombre) setNombre(c.nombre)
         if (c.correo) setCorreo(c.correo)
-        if (c.telefono) setTelefono(c.telefono || '')
+        setTelefono(c.telefono || '')
       }
     } catch {}
   }, [])
@@ -42,7 +42,7 @@ export default function DatosPedido() {
     }
     localStorage.setItem('orderInfo', JSON.stringify(orderInfo))
     // redirigir al siguiente paso de checkout (pago/resumen). Ajusta según tu flujo.
-    navigate('/resumen') // o la ruta que uses para pago
+    navigate('/pago') // o la ruta que uses para pago
   }
 
   return (

@@ -31,7 +31,9 @@ class LoginController extends Controller
         return response()->json([
             'message' => 'Autenticado',
             'cliente_id' => $user->cliente_id,
-            'nombre' => $user->nombre
+            'nombre' => $user->nombre,
+            'correo' => $user->correo,
+            'telefono' => $user->telefono ?? ''
         ]);
     }
 }

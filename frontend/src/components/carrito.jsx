@@ -159,7 +159,6 @@ return (
        <div className="confirm-modal" role="dialog" aria-modal="true" aria-label="Iniciar sesión o continuar como invitado">
          <div className="confirm-card">
            <h3>¿Deseas iniciar sesión o continuar como invitado?</h3>
-           <p>Si inicias sesión recuperaremos tus datos automáticamente. Si prefieres, puedes continuar como invitado y proporcionar los datos para el pedido.</p>
            <div className="confirm-actions">
              <button className="btn-secondary" onClick={closePrompt}>Cancelar</button>
              <button className="btn-outline" onClick={chooseGuest}>Continuar como invitado</button>

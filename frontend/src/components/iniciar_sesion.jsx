@@ -25,7 +25,7 @@ export default function IniciarSesion() {
       if (!resp.ok) throw new Error(json.message || 'Error en login')
 
       // Guardar usuario mínimo en localStorage para mostrar nombre en header
-      const cliente = { cliente_id: json.cliente_id, nombre: json.nombre, correo }
+      const cliente = { cliente_id: json.cliente_id, nombre: json.nombre, correo, telefono: json.telefono }
       localStorage.setItem('cliente', JSON.stringify(cliente))
 
       window.location.href = '/'
@@ -69,4 +69,3 @@ export default function IniciarSesion() {
     </div>
   )
 }
-// ...existing code...

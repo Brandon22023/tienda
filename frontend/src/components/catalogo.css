@@ -114,3 +114,19 @@
   .catalogo-dropdown-wrap { left: 8px; top: 52px; width: calc(100% - 16px); max-width: 520px; }
 }
 
+.vc-list-img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+  background: #f8fbff;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+.modal-thumb img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}

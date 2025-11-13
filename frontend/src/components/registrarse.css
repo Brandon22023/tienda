@@ -1,4 +1,4 @@
-/* ...existing code... */
+
 :root{
   --accent-1: #4b70cf;
   --accent-2: #6ea0ff;
@@ -173,4 +173,3 @@ h2{
   .register-form .field:nth-child(4){ grid-column: auto; }
   .btn-primary{ grid-column: auto; }
 }
-/* ...existing code... */
