@@ -444,9 +444,9 @@ npm run preview
 
 ### Video de Ejemplo
 
-A continuación se muestra un video demostrativo del flujo completo de la aplicación:
+En el siguiente video se presenta una demostración completa del flujo de usuario, mostrando todos los pasos desde la navegación por el catálogo, selección de productos, gestión del carrito, autenticación y finalización del pedido.
 
-<iframe src="https://drive.google.com/file/d/1nXtFic5Xpg8uRRhwrmYA3QkHc7LRZNSj/preview" width="640" height="480" allow="autoplay"></iframe>
+[Visualizar demostración en Google Drive](https://drive.google.com/file/d/1nXtFic5Xpg8uRRhwrmYA3QkHc7LRZNSj/view?usp=sharing)
 
 ## Stack Tecnológico
 
