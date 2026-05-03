@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './pago.css'
+import { apiUrl } from '../lib/api.js'
 
 export default function Pago() {
   const navigate = useNavigate()
@@ -47,7 +48,7 @@ export default function Pago() {
         cliente_id: cliente ? cliente.cliente_id : null,
         total: Number(total || 0)
       }
-      const resp = await fetch('http://127.0.0.1:8000/api/pedidos', {
+      const resp = await fetch(apiUrl('/api/pedidos'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -76,7 +77,7 @@ export default function Pago() {
         cantidad: Number(it.cantidad || 1),
         precio_unitario: Number(it.precio || 0)
       }))
-      const resp = await fetch(`http://127.0.0.1:8000/api/pedidos/${orderId}/detalles`, {
+      const resp = await fetch(apiUrl(`/api/pedidos/${orderId}/detalles`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items })

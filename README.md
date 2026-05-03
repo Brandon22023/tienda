@@ -107,6 +107,43 @@ npm run dev
 
 El servidor estará disponible en `http://localhost:5173`
 
+## CI/CD En GitHub
+
+Este repositorio ya incluye workflows en `.github/workflows`.
+
+- `CI` corre en cada `push` y `pull_request` sobre `main`.
+- `Deploy` se ejecuta manualmente desde GitHub Actions.
+
+### Secrets necesarios para despliegue
+
+Configura estos secretos antes de ejecutar `Deploy`:
+
+- `DEPLOY_HOST`
+- `DEPLOY_PATH`
+- `DEPLOY_USER`
+- `DEPLOY_SSH_KEY`
+- `VITE_API_BASE_URL`
+- `LARAVEL_APP_KEY`
+- `LARAVEL_APP_URL`
+- `LARAVEL_DB_CONNECTION`
+- `LARAVEL_DB_HOST`
+- `LARAVEL_DB_PORT`
+- `LARAVEL_DB_DATABASE`
+- `LARAVEL_DB_USERNAME`
+- `LARAVEL_DB_PASSWORD`
+
+### Cómo probarlo sin nube
+
+Si solo quieres probar el pipeline en GitHub y no tienes servidor todavía, abre `Deploy` desde Actions y ejecútalo en modo `dry-run`.
+
+- En `dry-run` no necesitas configurar `DEPLOY_HOST`, `DEPLOY_PATH`, `DEPLOY_USER` ni `DEPLOY_SSH_KEY`.
+- Tampoco necesitas una base de datos en la nube; el workflow usa valores locales simulados para validar build y configuración.
+- Cuando tengas servidor real, cambia el modo a `deploy` y completa todos los secretos.
+
+### Variables del frontend
+
+El frontend ya usa `VITE_API_BASE_URL`. En local puede apuntar a `http://127.0.0.1:8000` y en producción al dominio real del backend.
+
 ## Esquema de Base de Datos
 
 ### Diagrama Entidad-Relación

@@ -1,0 +1,145 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Elige dry-run para probar el pipeline sin servidor, o deploy para desplegar de verdad'
+        required: true
+        default: dry-run
+        type: choice
+        options:
+          - dry-run
+          - deploy
+
+jobs:
+  deploy:
+    name: Build and deploy
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_MODE: ${{ inputs.mode }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+      LARAVEL_APP_KEY: ${{ secrets.LARAVEL_APP_KEY }}
+      LARAVEL_APP_URL: ${{ secrets.LARAVEL_APP_URL }}
+      LARAVEL_DB_CONNECTION: ${{ secrets.LARAVEL_DB_CONNECTION }}
+      LARAVEL_DB_HOST: ${{ secrets.LARAVEL_DB_HOST }}
+      LARAVEL_DB_PORT: ${{ secrets.LARAVEL_DB_PORT }}
+      LARAVEL_DB_DATABASE: ${{ secrets.LARAVEL_DB_DATABASE }}
+      LARAVEL_DB_USERNAME: ${{ secrets.LARAVEL_DB_USERNAME }}
+      LARAVEL_DB_PASSWORD: ${{ secrets.LARAVEL_DB_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, curl, fileinfo, pdo_mysql, tokenizer, xml, zip
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Print mode
+        run: echo "Running deploy workflow in $DEPLOY_MODE mode"
+
+      - name: Install backend dependencies
+        working-directory: Backend
+        run: composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader --no-progress
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Create backend env file
+        run: |
+          if [ "$DEPLOY_MODE" = "dry-run" ]; then
+            API_URL=http://127.0.0.1:8000
+            APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+            DB_CONNECTION=sqlite
+            DB_HOST=127.0.0.1
+            DB_PORT=3306
+            DB_DATABASE=Backend/database/database.sqlite
+            DB_USERNAME=root
+            DB_PASSWORD=
+          else
+            API_URL=${LARAVEL_APP_URL}
+            APP_KEY=${LARAVEL_APP_KEY}
+            DB_CONNECTION=${LARAVEL_DB_CONNECTION}
+            DB_HOST=${LARAVEL_DB_HOST}
+            DB_PORT=${LARAVEL_DB_PORT}
+            DB_DATABASE=${LARAVEL_DB_DATABASE}
+            DB_USERNAME=${LARAVEL_DB_USERNAME}
+            DB_PASSWORD=${LARAVEL_DB_PASSWORD}
+          fi
+
+          cat > Backend/.env <<EOF
+          APP_NAME=Laravel
+          APP_ENV=production
+          APP_KEY=${APP_KEY}
+          APP_DEBUG=false
+          APP_URL=${API_URL}
+          LOG_CHANNEL=stack
+          DB_CONNECTION=${DB_CONNECTION}
+          DB_HOST=${DB_HOST}
+          DB_PORT=${DB_PORT}
+          DB_DATABASE=${DB_DATABASE}
+          DB_USERNAME=${DB_USERNAME}
+          DB_PASSWORD=${DB_PASSWORD}
+          CACHE_STORE=file
+          SESSION_DRIVER=file
+          QUEUE_CONNECTION=sync
+          MAIL_MAILER=log
+          VITE_APP_NAME=Electrocore
+          EOF
+
+      - name: Build frontend
+        working-directory: frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: npm run build
+
+      - name: Skip remote deploy in dry-run mode
+        if: env.DEPLOY_MODE == 'dry-run'
+        run: echo "Dry-run completed. No SSH, rsync or remote commands were executed."
+
+      - name: Configure SSH
+        if: env.DEPLOY_MODE == 'deploy'
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Trust deploy host
+        if: env.DEPLOY_MODE == 'deploy'
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Sync files to server
+        if: env.DEPLOY_MODE == 'deploy'
+        run: |
+          rsync -az --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'frontend/node_modules' \
+            --exclude 'Backend/node_modules' \
+            ./ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
+
+      - name: Run remote Laravel commands
+        if: env.DEPLOY_MODE == 'deploy'
+        run: |
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "
+            set -e
+            cd '$DEPLOY_PATH/Backend'
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache || true
+          "

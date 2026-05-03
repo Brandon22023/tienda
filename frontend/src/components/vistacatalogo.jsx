@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import './vistacatalogo.css'
+import { apiUrl } from '../lib/api.js'
 export default function vistacatalogo({ categorias }) {
   const { categoriaId } = useParams();
   const [productosCategoria, setProductosCategoria] = useState([]);
@@ -22,13 +23,12 @@ export default function vistacatalogo({ categorias }) {
       setLoadingCategoria(true);
       setErrorCategoria(null);
       try {
-        const base = 'http://127.0.0.1:8000';
         let endpoint = '/api/catalogo';
       
         if (selected === 'mayor') endpoint = '/api/catalogo/mayor';
         if (selected === 'menor') endpoint = '/api/catalogo/menor';
 
-        const resp = await fetch(base + endpoint);
+        const resp = await fetch(apiUrl(endpoint));
         if (!resp.ok) throw new Error('Error al cargar catálogo');
         
         

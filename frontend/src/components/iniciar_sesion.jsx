@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logoPM from '../assets/IMG/logocentral.png'
 import './iniciar_sesion.css'
+import { apiUrl } from '../lib/api.js'
 
 export default function IniciarSesion() {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ export default function IniciarSesion() {
     setError(null)
     setLoading(true)
     try {
-      const resp = await fetch('http://127.0.0.1:8000/api/login', {
+      const resp = await fetch(apiUrl('/api/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo, password })

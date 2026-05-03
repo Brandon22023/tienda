@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import logoPM from '../assets/IMG/logocentral.png'
 import './registrarse.css'
+import { apiUrl } from '../lib/api.js'
 
 export default function Registrarse() {
   const navigate = useNavigate()
@@ -19,7 +20,7 @@ export default function Registrarse() {
     setError(null)
     setLoading(true)
     try {
-      const resp = await fetch('http://127.0.0.1:8000/api/register', {
+      const resp = await fetch(apiUrl('/api/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

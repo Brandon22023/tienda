@@ -11,6 +11,7 @@ import Pedido from './components/pedidos.jsx'
 import Pago from './components/pago.jsx'
 import Resumen from './components/resumen.jsx'
 import { useState, useEffect } from 'react'
+import { apiUrl } from './lib/api.js'
 
 function App() {
   // Mensaje general traído desde /api/inicio
@@ -105,7 +106,7 @@ function App() {
   useEffect(() => {
     async function cargar() {
       try {
-        const resp = await fetch('http://127.0.0.1:8000/api/inicio')
+        const resp = await fetch(apiUrl('/api/inicio'))
         if (!resp.ok) {
           const txt = await resp.text()
           throw new Error(`Error inicio (${resp.status}) ${txt}`)
