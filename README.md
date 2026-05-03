@@ -144,6 +144,32 @@ Si solo quieres probar el pipeline en GitHub y no tienes servidor todavía, abre
 
 El frontend ya usa `VITE_API_BASE_URL`. En local puede apuntar a `http://127.0.0.1:8000` y en producción al dominio real del backend.
 
+## Pruebas React
+
+El frontend incluye pruebas unitarias con Vitest y Testing Library en [frontend/src/App.test.jsx](frontend/src/App.test.jsx).
+
+### Qué validan
+
+- Renderizado de productos desde la API en la pantalla principal.
+- Agregado de productos al carrito y actualización del contador del carrito.
+- Navegación al carrito desde el botón de carrito del header.
+
+### Cómo ejecutarlas
+
+```bash
+cd frontend
+npm test
+```
+
+### Requisitos
+
+- `vitest`
+- `jsdom`
+- `@testing-library/react`
+- `@testing-library/jest-dom`
+
+Estas dependencias ya están declaradas en [frontend/package.json](frontend/package.json).
+
 ## Esquema de Base de Datos
 
 ### Diagrama Entidad-Relación
@@ -454,6 +480,26 @@ npm run lint
 
 # Vista previa de la compilación de producción
 npm run preview
+```
+
+## Pruebas Backend Laravel
+
+La API backend incluye pruebas en [Backend/tests/Feature/ApiFlowTest.php](Backend/tests/Feature/ApiFlowTest.php).
+
+### Qué validan
+
+- `login success`: autentica un cliente con credenciales válidas.
+- `login fail`: rechaza credenciales incorrectas.
+- `get productos`: devuelve productos desde `/api/catalogo`.
+- `add carrito`: inserta los detalles de un pedido en `/api/pedidos/{id}/detalles`.
+- `total carrito`: guarda el total enviado al crear el pedido.
+- `crear pedido`: crea un pedido nuevo en `/api/pedidos`.
+
+### Cómo ejecutarlas
+
+```bash
+cd Backend
+php artisan test --filter=ApiFlowTest
 ```
 
 ## Consideraciones de Seguridad
