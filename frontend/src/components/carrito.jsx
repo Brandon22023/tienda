@@ -66,7 +66,7 @@ export default function Carrito() {
         return
       }
       setShowLoginPrompt(true)
-    } catch (e) {
+    } catch {
       // en caso de error, permitir continuar como invitado
       navigate('/pedidos')
     }

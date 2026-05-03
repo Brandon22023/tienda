@@ -134,7 +134,7 @@ export default function MAPASENPEDIDOS({ value, onChange, placeholder = 'Buscar 
       const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
       const json = await res.json()
       setResults(json || [])
-    } catch (e) {
+    } catch {
       setResults([])
     } finally {
       setLoading(false)
@@ -147,7 +147,7 @@ export default function MAPASENPEDIDOS({ value, onChange, placeholder = 'Buscar 
       const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&addressdetails=1${emailParam ? '&email=' + emailParam : ''}`
       const res = await fetch(url, { headers: { 'Accept': 'application/json' } })
       return await res.json()
-    } catch (e) {
+    } catch {
       return null
     }
   }
@@ -199,7 +199,7 @@ export default function MAPASENPEDIDOS({ value, onChange, placeholder = 'Buscar 
 
               // mostrar zona de precisión (opcional) — se reemplaza si ya existe
               if (markerRef.current.accuracyCircle) {
-                try { mapInstance.current.removeLayer(markerRef.current.accuracyCircle) } catch {}
+                try { mapInstance.current.removeLayer(markerRef.current.accuracyCircle) } catch { console.warn('No se pudo quitar el círculo de precisión') }
               }
               try {
                 const circle = L.circle([lat, lng], {
@@ -209,7 +209,9 @@ export default function MAPASENPEDIDOS({ value, onChange, placeholder = 'Buscar 
                   fillColor: 'rgba(75,112,207,0.08)'
                 }).addTo(mapInstance.current)
                 markerRef.current.accuracyCircle = circle
-              } catch (e) { /* noop */ }
+              } catch {
+                console.warn('No se pudo dibujar el círculo de precisión')
+              }
 
               // reverse geocode (puede devolver la dirección más cercana; las coords son exactas)
               const info = await reverseGeocode(lat, lng)
@@ -223,8 +225,8 @@ export default function MAPASENPEDIDOS({ value, onChange, placeholder = 'Buscar 
                 accuracy,           // agrego accuracy para que sepas cuán precisa fue la lectura
                 source: 'geoloc'
               })
-            }, (err) => {
-              console.error('Geolocation error', err)
+            }, () => {
+              console.error('Geolocation error')
             }, {
               enableHighAccuracy: true,
               timeout: 15000,

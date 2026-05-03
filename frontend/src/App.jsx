@@ -27,27 +27,6 @@ function App() {
   const [cartCount, setCartCount] = useState(0)
  const [badgePulse, setBadgePulse] = useState(false)
 
- // lee el carrito y suma cantidades
- function readCartCount() {
-    try {
-      const raw = localStorage.getItem('cart')
-      const arr = raw ? JSON.parse(raw) : []
-      const newCount = Array.isArray(arr) ? arr.length : 0
-
-      if (newCount !== cartCount) {
-        setCartCount(newCount)
-        if (newCount > 0) {
-          setBadgePulse(true)
-          setTimeout(() => setBadgePulse(false), 420)
-        }
-      } else {
-        // mantener estado sin pulso si no cambió
-        setCartCount(newCount)
-      }
-    } catch {
-      setCartCount(0)
-    }
-  }
   function addToCart(product, qty = 1) {
     try {
       const key = 'cart'
@@ -67,12 +46,28 @@ function App() {
       }
       localStorage.setItem(key, JSON.stringify(cart))
       window.dispatchEvent(new Event('cart-updated'))
-    } catch (e) {
-      console.error('Error guardando carrito', e)
+    } catch {
+      console.error('Error guardando carrito')
     }
   }
 
  useEffect(() => {
+   function readCartCount() {
+     try {
+       const raw = localStorage.getItem('cart')
+       const arr = raw ? JSON.parse(raw) : []
+       const newCount = Array.isArray(arr) ? arr.length : 0
+
+       setCartCount(newCount)
+       if (newCount > 0) {
+         setBadgePulse(true)
+         setTimeout(() => setBadgePulse(false), 420)
+       }
+     } catch {
+       setCartCount(0)
+     }
+   }
+
    readCartCount()
    function onUpdate() { readCartCount() }
    window.addEventListener('cart-updated', onUpdate)
@@ -84,8 +79,8 @@ function App() {
     try {
       const raw = localStorage.getItem('cliente')
       if (raw) setCliente(JSON.parse(raw))
-    } catch (e) {
-      // no hacer nada
+    } catch {
+      setCliente(null)
     }
   }, [])
 
@@ -126,7 +121,6 @@ function App() {
   useEffect(() => {
     // Función para detectar si estamos al final del scroll
     function handleScroll() {
-      const atBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 2
       // Puedes usar este estado si lo necesitas para mostrar el footer
     }
     window.addEventListener('scroll', handleScroll)

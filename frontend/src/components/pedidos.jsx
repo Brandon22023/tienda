@@ -20,7 +20,11 @@ export default function DatosPedido() {
         if (c.correo) setCorreo(c.correo)
         setTelefono(c.telefono || '')
       }
-    } catch {}
+    } catch {
+      setNombre('')
+      setCorreo('')
+      setTelefono('')
+    }
   }, [])
 
   function handleSubmit(e) {

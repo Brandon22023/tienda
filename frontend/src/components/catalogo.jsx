@@ -2,18 +2,16 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import './catalogo.css'
 
-export default function Catalogo({ open = false, categorias = [], onSelect = () => {} }) {
-  const defaultCats = [
-    { id: 'ram', nombre: 'Memoria Ram', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: '⚡' },
-    { id: 'laptops', nombre: 'Laptops', descripcion: 'Ultrabooks y gamers', color: '#ff9f6f', icon: '💻' },
-    { id: 'perifericos', nombre: 'Periféricos', descripcion: 'Teclados, mice y más', color: '#8be3c3', icon: '⌨️' },
-    { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: '🖥️' },
-    { id: 'almacenamiento', nombre: 'Almacenamiento', descripcion: 'SSD, HDD y NVMe', color: '#ffd36f', icon: '💾' },
-    { id: 'audio', nombre: 'Audio', descripcion: 'Auriculares y parlantes', color: '#7fdcff', icon: '🎧' },
-    
-  ]
+const defaultCats = [
+  { id: 'ram', nombre: 'Memoria Ram', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: '⚡' },
+  { id: 'laptops', nombre: 'Laptops', descripcion: 'Ultrabooks y gamers', color: '#ff9f6f', icon: '💻' },
+  { id: 'perifericos', nombre: 'Periféricos', descripcion: 'Teclados, mice y más', color: '#8be3c3', icon: '⌨️' },
+  { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: '🖥️' },
+  { id: 'almacenamiento', nombre: 'Almacenamiento', descripcion: 'SSD, HDD y NVMe', color: '#ffd36f', icon: '💾' },
+  { id: 'audio', nombre: 'Audio', descripcion: 'Auriculares y parlantes', color: '#7fdcff', icon: '🎧' },
+]
 
-  
+export default function Catalogo({ open = false, categorias = [], onSelect = () => {} }) {
   // Normaliza la prop "categorias": permite que el padre envíe strings o objetos completos
   const source = useMemo(() => {
     if (!categorias || categorias.length === 0) return defaultCats

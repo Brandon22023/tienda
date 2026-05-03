@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import './vistacatalogo.css'
 import { apiUrl } from '../lib/api.js'
-export default function vistacatalogo({ categorias }) {
+export default function Vistacatalogo() {
   const { categoriaId } = useParams();
   const [productosCategoria, setProductosCategoria] = useState([]);
   const [loadingCategoria, setLoadingCategoria] = useState(false);
@@ -95,12 +95,6 @@ export default function vistacatalogo({ categorias }) {
  }
   //para agregar al carrito
   // Abre modal para elegir cantidad
-  function openQtyModal(product) {
-    setModalProduct(product)
-    setModalQty(1)
-    setModalOpen(true)
-  }
-
   // Agrega al carrito en localStorage y notifica a la app
   function addToCart(product, qty) {
     try {
@@ -122,8 +116,8 @@ export default function vistacatalogo({ categorias }) {
       localStorage.setItem(key, JSON.stringify(cart))
       // evento para que otros componentes (Carrito) recarguen
       window.dispatchEvent(new Event('cart-updated'))
-    } catch (e) {
-      console.error('Error guardando carrito', e)
+    } catch {
+      console.error('Error guardando carrito')
     }
   }
 
@@ -190,7 +184,7 @@ export default function vistacatalogo({ categorias }) {
         ))}
       </ul>
       {/* Modal de la cantidad del producto */}
-      {modalOpen && (
+      {modalOpen && modalProduct && (
         <div className="qty-modal-overlay" role="dialog" aria-modal="true" onClick={() => setModalOpen(false)}>
           <div className="qty-modal" onClick={(e) => e.stopPropagation()}>
             <h4>Añadir al carrito</h4>

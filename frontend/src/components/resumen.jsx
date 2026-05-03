@@ -27,9 +27,15 @@ export default function Resumen() {
             const s = JSON.parse(saved)
             setOrderNumber(s.id)
             setGeneratedAtStr(new Date(s.fecha).toLocaleString())
-          } catch {}
+          } catch {
+            setOrderNumber(null)
+          }
         }
-    } catch { /* ignore */ }
+    } catch {
+      setOrderInfo(null)
+      setCart([])
+      setPaymentInfo(null)
+    }
   }, [])
 
   const total = cart.reduce((s, it) => s + (Number(it.precio || 0) * Number(it.cantidad || 1)), 0)
@@ -93,7 +99,7 @@ export default function Resumen() {
         w.document.close()
         w.focus()
         setTimeout(() => { w.print(); }, 500)
-      } catch (e) {
+      } catch {
         // ya mostrado en crearPedidoEnServidor
       }
     })()
@@ -106,7 +112,7 @@ export default function Resumen() {
     return String(str).replace(/[&<>"']/g, (s) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))
   }
 
-  function finalizar(sinDescarga = false) {
+  function finalizar() {
     // limpiar carrito y marcar finalizado
     localStorage.removeItem('cart')
     // notificar al resto de la app para que el contador se actualice

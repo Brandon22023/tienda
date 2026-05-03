@@ -20,7 +20,7 @@ export default function Pago() {
       } else {
         setFormErrorFallback(v)
       }
-    } catch (e) {
+    } catch {
       setFormErrorFallback(v)
     }
   }
@@ -30,7 +30,9 @@ export default function Pago() {
     try {
       const raw = localStorage.getItem('orderInfo')
       if (raw) setOrderInfo(JSON.parse(raw))
-    } catch {}
+    } catch {
+      setOrderInfo(null)
+    }
   }, [])
 
   function validarTarjeta() {
@@ -55,7 +57,7 @@ export default function Pago() {
       })
       const text = await resp.text()
       let json = null
-      try { json = text ? JSON.parse(text) : null } catch (e) { /* respuesta no JSON */ }
+      try { json = text ? JSON.parse(text) : null } catch { json = null }
       if (!resp.ok) {
         console.error('Crear pedido falló', resp.status, text)
         throw new Error(json?.message || text || `status:${resp.status}`)
@@ -84,7 +86,7 @@ export default function Pago() {
       })
       const text = await resp.text()
       let json = null
-      try { json = text ? JSON.parse(text) : null } catch (e) {}
+      try { json = text ? JSON.parse(text) : null } catch { json = null }
       if (!resp.ok) {
         console.error('Crear detalles falló', resp.status, text)
         throw new Error(json?.message || text || `status:${resp.status}`)
@@ -130,7 +132,7 @@ export default function Pago() {
 
         // navegamos al resumen (resumen leerá savedOrder)
         navigate('/resumen')
-      } catch (err) {
+      } catch {
         alert('No se pudo guardar el pedido en el servidor. Revisa la consola del navegador y los logs del backend.')
       }
     })()
