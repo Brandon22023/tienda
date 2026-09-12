@@ -1,0 +1,4 @@
+test/.phpunit.result.cache
+.env
+.env.*
+!.env.example
