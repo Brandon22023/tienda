@@ -4,7 +4,9 @@ set -e
 php artisan migrate --force
 
 # Carga los datos iniciales solo en una base de datos sin productos.
-if ! php artisan tinker --execute="exit(\\Illuminate\\Support\\Facades\\DB::table('productos')->exists() ? 0 : 1);" >/dev/null 2>&1; then
+product_count="$(php artisan tinker --execute="echo \\Illuminate\\Support\\Facades\\DB::table('productos')->count();" 2>/dev/null | tr -d '[:space:]')"
+if [ "$product_count" = "0" ]; then
+    echo "No hay productos. Cargando datos iniciales..."
     php artisan db:seed --force
 fi
 
