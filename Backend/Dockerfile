@@ -9,9 +9,9 @@ RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-
 FROM php:8.2-cli-alpine
 WORKDIR /var/www/html
 
-RUN apk add --no-cache icu-libs oniguruma libzip \
-    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev oniguruma-dev libzip-dev \
-    && docker-php-ext-install bcmath intl mbstring opcache pdo_mysql \
+RUN apk add --no-cache icu-libs oniguruma libzip libpq \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev oniguruma-dev libzip-dev postgresql-dev \
+    && docker-php-ext-install bcmath intl mbstring opcache pdo_mysql pdo_pgsql \
     && apk del .build-deps
 
 COPY --from=vendor /app/vendor ./vendor
@@ -24,4 +24,4 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
 
 EXPOSE 8000
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
