@@ -1,6 +1,7 @@
-const { defineConfig } = require('cypress')
-
-module.exports = defineConfig({
+// Keep the external test project independent from frontend/node_modules.
+// Cypress accepts a plain configuration object, so no package import is
+// needed when this file is loaded from ../test/Cypress.
+module.exports = {
   video: true,
   screenshotsFolder: 'results/screenshots',
   videosFolder: 'results/videos',
@@ -13,4 +14,4 @@ module.exports = defineConfig({
       openMode: 0
     }
   }
-})
+}

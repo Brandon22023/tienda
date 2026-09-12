@@ -19,7 +19,7 @@ Resultados ejecutados:
 | Vitest frontend | 3/3 pruebas |
 | Playwright | 12/12 pruebas |
 | Selenium | 5/5 pruebas |
-| Cypress | No ejecutable en este Windows; 8 casos escritos y validados sintácticamente |
+| Cypress | 8 casos escritos; la suite queda preparada para CI Linux. En Windows el ejecutable local falla al verificar `--smoke-test/--ping` |
 | ESLint | OK |
 | Build Vite | OK |
 | `docker compose config` | OK |
