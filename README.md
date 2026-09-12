@@ -484,7 +484,7 @@ npm run preview
 
 ## Pruebas Backend Laravel
 
-La API backend incluye pruebas en [Backend/tests/Feature/ApiFlowTest.php](Backend/tests/Feature/ApiFlowTest.php).
+La API backend incluye pruebas externas en [test/Feature/ApiFlowTest.php](test/Feature/ApiFlowTest.php).
 
 ### Qué validan
 
@@ -498,8 +498,7 @@ La API backend incluye pruebas en [Backend/tests/Feature/ApiFlowTest.php](Backen
 ### Cómo ejecutarlas
 
 ```bash
-cd Backend
-php artisan test --filter=ApiFlowTest
+php Backend/vendor/bin/phpunit -c test/phpunit.xml --filter=ApiFlowTest
 ```
 
 ## Consideraciones de Seguridad
@@ -594,6 +593,24 @@ En el siguiente video se presenta una demostración completa del flujo de usuari
 - [Vite Documentation](https://vite.dev)
 - [Leaflet Documentation](https://leafletjs.com)
 - [MySQL Documentation](https://dev.mysql.com/doc)
+
+## Docker
+
+Desde la carpeta raíz:
+
+```bash
+docker compose up --build
+```
+
+Frontend: `http://localhost:5173` · API: `http://localhost:8000`.
+
+Para cargar los productos iniciales:
+
+```bash
+docker compose exec backend php artisan db:seed --force
+```
+
+Los datos de MySQL se conservan en el volumen `mysql_data`. Para eliminar también ese volumen usa `docker compose down -v`.
 
 ## Licencia
 
