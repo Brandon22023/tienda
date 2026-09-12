@@ -81,3 +81,68 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  browser-e2e:
+    name: Browser E2E (Playwright, Selenium, Cypress)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend and browser test dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Start application stack
+        run: docker compose up -d --build
+
+      - name: Wait for API
+        run: |
+          for attempt in {1..30}; do
+            if curl --fail --silent http://localhost:8000/api/inicio > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs --no-color
+          exit 1
+
+      - name: Run Playwright
+        working-directory: frontend
+        env:
+          PLAYWRIGHT_CHANNEL: chromium
+        run: npm run test:e2e
+
+      - name: Run Selenium
+        working-directory: frontend
+        run: npm run test:selenium
+
+      - name: Run Cypress
+        working-directory: frontend
+        run: npm run test:cypress
+
+      - name: Upload browser test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          if-no-files-found: ignore
+          path: |
+            test/Playwright/results
+            test/Selenium/results
+            test/Cypress/results
+
+      - name: Stop application stack
+        if: always()
+        run: docker compose down -v
