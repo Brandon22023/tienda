@@ -1,8 +1,18 @@
-const rawApiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+const rawApiBaseUrl = String(
+  import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || ''
+).trim()
 
-export const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, '')
+const normalizedApiBaseUrl = rawApiBaseUrl.replace(/\/$/, '')
+
+// `/api` is the internal proxy path used by Docker/nginx. The endpoint
+// callers already include `/api`, so keep it relative instead of producing
+// `/api/api/...`.
+export const API_BASE_URL = normalizedApiBaseUrl === '/api'
+  ? ''
+  : normalizedApiBaseUrl
 
 export function apiUrl(path) {
-  if (!path) return API_BASE_URL
-  return `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+  const normalizedPath = path ? (path.startsWith('/') ? path : `/${path}`) : ''
+  if (!API_BASE_URL) return normalizedPath || '/'
+  return `${API_BASE_URL}${normalizedPath}`
 }

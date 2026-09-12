@@ -6,8 +6,8 @@ COPY package.json package-lock.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit --no-fund
 
 COPY . .
-ARG VITE_API_BASE_URL=http://localhost:8000
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ARG VITE_API_URL=
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 FROM nginx:1.27-alpine
