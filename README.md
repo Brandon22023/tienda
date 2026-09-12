@@ -602,7 +602,12 @@ Desde la carpeta raíz:
 docker compose up --build
 ```
 
-MySQL is exposed on `localhost:3307` by default to avoid conflicts with a local MySQL installation. To use another host port, run `MYSQL_PORT=3306 docker compose up --build`.
+MySQL is exposed on `localhost:3307` by default to avoid conflicts with a local MySQL installation. To use another host port in PowerShell, set `$env:MYSQL_PORT` before starting Compose:
+
+```powershell
+$env:MYSQL_PORT = "3308"
+docker compose up --build
+```
 
 Frontend: `http://localhost:5173` · API: `http://localhost:8000`.
 
