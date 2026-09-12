@@ -202,13 +202,13 @@ export default function Pago() {
                 <div><strong>Dirección:</strong> {orderInfo.direccion}</div>
                 {orderInfo.nota && <div><strong>Nota:</strong> {orderInfo.nota}</div>}
               </div>
-              <div className="checkout-items" aria-label="Artículos del pedido">
+              <div className="checkout-items" data-testid="checkout-items" aria-label="Artículos del pedido">
                 <div className="checkout-items-title">Artículos</div>
                 {cart.length > 0 ? cart.map(item => {
                   const quantity = Number(item.cantidad || 1)
                   const price = Number(item.precio || 0)
                   return (
-                    <div className="checkout-item" key={item.idproductos}>
+                    <div className="checkout-item" data-testid="checkout-item" key={item.idproductos}>
                       <img src={item.image_url} alt="" className="checkout-item-image" />
                       <div className="checkout-item-details">
                         <strong>{item.nombre}</strong>
@@ -252,7 +252,7 @@ export default function Pago() {
             </>
           )}
 
-          <button className="btn-primary" type="submit" style={{ gridColumn: '1 / 3' }}>
+          <button className="btn-primary" data-testid="payment-submit" type="submit" style={{ gridColumn: '1 / 3' }}>
             {method === 'efectivo' ? 'Continuar con efectivo' : 'continuar con tarjeta'}
           </button>
 

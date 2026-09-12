@@ -50,15 +50,15 @@ export default function IniciarSesion() {
         <form className="login-form" onSubmit={handleSubmit}>
           <label className="field">
             <span className="field-label">Correo</span>
-            <input className="input" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
+            <input className="input" data-testid="login-email" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
           </label>
 
           <label className="field">
             <span className="field-label">Contraseña</span>
-            <input className="input" value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="••••••••" />
+            <input className="input" data-testid="login-password" value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="••••••••" />
           </label>
 
-          <button className="btn-primary" type="submit" disabled={loading}>{loading ? 'Entrando...' : 'Iniciar sesión'}</button>
+          <button className="btn-primary" data-testid="login-submit" type="submit" disabled={loading}>{loading ? 'Entrando...' : 'Iniciar sesión'}</button>
           {error && <p style={{ color: 'red', textAlign: 'center', marginTop: 8 }}>{error}</p>}
         </form>
 

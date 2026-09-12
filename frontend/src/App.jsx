@@ -171,7 +171,7 @@ function App() {
       <header className="main-header">
         <div className="header-container">
           <div className="header-left" style={{position:'relative'}} >
-            <button className="menu-btn" onClick={() => setMenuOpen(v => !v)} >
+            <button className="menu-btn" data-testid="category-menu" aria-label="Abrir catálogo" onClick={() => setMenuOpen(v => !v)} >
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="4" y1="7" x2="20" y2="7"/>
                 <line x1="4" y1="12" x2="20" y2="12"/>
@@ -199,8 +199,8 @@ function App() {
             />
           </div>
           <div className="header-center">
-            <input type="text" className="buscador-input" placeholder="Buscar en la tienda..." />
-            <button className="buscador-btn">
+            <input type="text" className="buscador-input" data-testid="store-search" placeholder="Buscar en la tienda..." />
+            <button className="buscador-btn" data-testid="store-search-submit" aria-label="Buscar">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="9" r="7"/><line x1="16" y1="16" x2="13.5" y2="13.5"/></svg>
             </button>
           </div>
@@ -210,6 +210,7 @@ function App() {
             {cliente ? (
               <button
                 className="icon-btn"
+                data-testid="account-button"
                 onClick={handleCuentaClick}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleCuentaClick() }}
                 title={cliente.correo}
@@ -222,6 +223,7 @@ function App() {
             ) : (
               <button
                 className="icon-btn"
+                data-testid="account-button"
                 onClick={() => navigate('/login')}
                 onKeyDown={(e) => { if (e.key === 'Enter') navigate('/login') }}
               >
@@ -233,13 +235,13 @@ function App() {
             )}
 
 
-            <button className="icon-btn">
+            <button className="icon-btn" data-testid="favorites-button">
               <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
               <path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/>
               </svg>
               <span>Favoritos</span>
             </button>
-            <button className="icon-btn cart-btn"
+            <button className="icon-btn cart-btn" data-testid="cart-button"
               onClick={() => navigate('/carrito')}
               onKeyDown={(e) => { if (e.key === 'Enter') navigate('/carrito') }}>
               <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
@@ -274,13 +276,13 @@ function App() {
                 <h2>{mensaje?.titulo}</h2>
                 <div className="inicio-grid">
                   {productosInicio.map(p => (
-                    <article key={p.idproductos} className="producto-card">
+                    <article key={p.idproductos} className="producto-card" data-testid="home-product-card">
                       <img src={p.image_url} alt={p.nombre} />
                       <div className="producto-info">
                         <div className="producto-nombre">{p.nombre}</div>
                         <div className="producto-categoria">{p.categoria}</div>
                         <div className="producto-precio">Q {Number(p.precio).toFixed(2)}</div>
-                        <button className="producto-add" onClick={() => addToCart(p, 1)}>Agregar al carrito</button>
+                        <button className="producto-add" data-testid="home-add-to-cart" onClick={() => addToCart(p, 1)}>Agregar al carrito</button>
                       </div>
                     </article>
                   ))}

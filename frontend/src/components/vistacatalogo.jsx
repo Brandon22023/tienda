@@ -173,9 +173,9 @@ export default function Vistacatalogo() {
       )}
       <ul className="vc-grid">
         {productosCategoria.map(p => (
-          <li key={p.idproductos} className="vc-item">
+            <li key={p.idproductos} className="vc-item" data-testid="product-card">
             <img src={p.image_url} alt={p.nombre} className="vc-list-img" />
-            <button className="btn-agregar" onClick={() => agregarAlCarrito(p)}>Agregar al carrito</button>
+            <button className="btn-agregar" data-testid="product-add-to-cart" onClick={() => agregarAlCarrito(p)}>Agregar al carrito</button>
             <div style={{ fontWeight:700 }}>{p.nombre}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.categoria}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.descripcion}</div>
@@ -185,7 +185,7 @@ export default function Vistacatalogo() {
       </ul>
       {/* Modal de la cantidad del producto */}
       {modalOpen && modalProduct && (
-        <div className="qty-modal-overlay" role="dialog" aria-modal="true" onClick={() => setModalOpen(false)}>
+        <div className="qty-modal-overlay" data-testid="quantity-modal" role="dialog" aria-modal="true" onClick={() => setModalOpen(false)}>
           <div className="qty-modal" onClick={(e) => e.stopPropagation()}>
             <h4>Añadir al carrito</h4>
             <div className="modal-row">
@@ -196,13 +196,13 @@ export default function Vistacatalogo() {
                 <div className="modal-name">{modalProduct.nombre}</div>
                 <div className="modal-price">${modalProduct.precio}</div>
                 <div className="qty-control">
-                  <button onClick={() => setModalQty(q => Math.max(1, q - 1))}>−</button>
-                  <input type="number" min="1" value={modalQty} onChange={(e) => setModalQty(Math.max(1, Number(e.target.value || 1)))} />
-                  <button onClick={() => setModalQty(q => q + 1)}>+</button>
+                  <button aria-label="Disminuir cantidad" onClick={() => setModalQty(q => Math.max(1, q - 1))}>−</button>
+                  <input type="number" data-testid="quantity-input" min="1" value={modalQty} onChange={(e) => setModalQty(Math.max(1, Number(e.target.value || 1)))} />
+                  <button aria-label="Aumentar cantidad" onClick={() => setModalQty(q => q + 1)}>+</button>
                 </div>
                 <div className="modal-actions">
-                  <button className="btn-confirm" onClick={confirmAdd}>Agregar</button>
-                  <button className="btn-cancel" onClick={() => setModalOpen(false)}>Cancelar</button>
+                  <button className="btn-confirm" data-testid="quantity-confirm" onClick={confirmAdd}>Agregar</button>
+                  <button className="btn-cancel" data-testid="quantity-cancel" onClick={() => setModalOpen(false)}>Cancelar</button>
                 </div>
               </div>
             </div>

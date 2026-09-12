@@ -126,19 +126,19 @@ return (
             <div style={{ width:'100%' }}>
               <ul style={{ listStyle:'none', padding:0, margin:0, display:'grid', gap:12 }}>
                 {cart.map(item => (
-                  <li key={item.idproductos} className="cart-item-row">
+                  <li key={item.idproductos} className="cart-item-row" data-testid="cart-item">
                     <img src={item.image_url} alt={item.nombre} className="cart-item-thumb" />
                     <div className="cart-item-main">
                       <div className="cart-item-name">{item.nombre}</div>
                       <div className="cart-item-price">Q {Number(item.precio).toFixed(2)}</div>
                     </div>
                     <div className="cart-item-qty">
-                      <button aria-label="Disminuir cantidad" onClick={() => changeQty(item.idproductos, -1)}><Minus size={16} aria-hidden="true" /></button>
+                      <button data-testid="cart-decrease" aria-label="Disminuir cantidad" onClick={() => changeQty(item.idproductos, -1)}><Minus size={16} aria-hidden="true" /></button>
                       <span>{item.cantidad}</span>
-                      <button aria-label="Aumentar cantidad" onClick={() => changeQty(item.idproductos, +1)}><Plus size={16} aria-hidden="true" /></button>
+                      <button data-testid="cart-increase" aria-label="Aumentar cantidad" onClick={() => changeQty(item.idproductos, +1)}><Plus size={16} aria-hidden="true" /></button>
                     </div>
                     <div className="cart-item-total">Q {(Number(item.precio) * Number(item.cantidad)).toFixed(2)}</div>
-                    <button className="cart-item-remove" aria-label="Eliminar" onClick={() => removeItem(item.idproductos)}><Trash2 size={18} strokeWidth={2} aria-hidden="true" /></button>
+                    <button className="cart-item-remove" data-testid="cart-remove" aria-label="Eliminar" onClick={() => removeItem(item.idproductos)}><Trash2 size={18} strokeWidth={2} aria-hidden="true" /></button>
                   </li>
                 ))}
               </ul>
@@ -149,7 +149,7 @@ return (
               </div>
 
               <div style={{ display:'flex', justifyContent:'flex-end', marginTop:12 }}>
-                <button className="btn-cart-blue" onClick={handleContinue}>Continuar</button>
+                <button className="btn-cart-blue" data-testid="cart-continue" onClick={handleContinue}>Continuar</button>
               </div>
             </div>
           )}

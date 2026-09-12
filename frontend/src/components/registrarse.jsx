@@ -54,25 +54,25 @@ export default function Registrarse() {
         <form className="register-form" onSubmit={handleSubmit}>
           <label className="field">
             <span className="field-label">Nombre</span>
-            <input className="input" value={nombre} onChange={e => setNombre(e.target.value)} type="text" placeholder="Tu nombre completo" />
+            <input className="input" data-testid="register-name" value={nombre} onChange={e => setNombre(e.target.value)} type="text" placeholder="Tu nombre completo" />
           </label>
 
           <label className="field">
             <span className="field-label">Correo</span>
-            <input className="input" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
+            <input className="input" data-testid="register-email" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
           </label>
 
           <label className="field">
             <span className="field-label">Teléfono</span>
-            <input className="input" value={telefono} onChange={e => setTelefono(e.target.value)} type="tel" placeholder="+502 1234 5678" />
+            <input className="input" data-testid="register-phone" value={telefono} onChange={e => setTelefono(e.target.value)} type="tel" placeholder="+502 1234 5678" />
           </label>
 
           <label className="field">
             <span className="field-label">Contraseña</span>
-            <input className="input" value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="••••••••" />
+            <input className="input" data-testid="register-password" value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="••••••••" />
           </label>
 
-          <button className="btn-primary" type="submit" disabled={loading}>
+          <button className="btn-primary" data-testid="register-submit" type="submit" disabled={loading}>
             {loading ? 'Creando...' : 'Crear cuenta'}
           </button>
 

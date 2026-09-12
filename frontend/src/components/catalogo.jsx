@@ -73,6 +73,7 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
             <button
               key={cat.id}
               className="catalogo-card"
+              data-testid="category-card"
               onClick={() => onSelect(cat.nombre)}
               type="button"
             >

@@ -78,17 +78,17 @@ export default function DatosPedido() {
         <form className="register-form" onSubmit={handleSubmit}>
           <label className="field" style={{ gridColumn: '1 / 3' }}>
             <span className="field-label">Nombre completo</span>
-            <input className="input" value={nombre} onChange={e => setNombre(e.target.value)} type="text" placeholder="Nombre y apellidos" />
+            <input className="input" data-testid="order-name" value={nombre} onChange={e => setNombre(e.target.value)} type="text" placeholder="Nombre y apellidos" />
           </label>
 
           <label className="field" style={{ gridColumn: '1 / 3' }}>
             <span className="field-label">Correo</span>
-            <input className="input" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
+            <input className="input" data-testid="order-email" value={correo} onChange={e => setCorreo(e.target.value)} type="email" placeholder="tucorreo@ejemplo.com" />
           </label>
 
           <label className="field">
             <span className="field-label">Teléfono</span>
-            <input className="input" value={telefono} onChange={e => setTelefono(e.target.value)} type="tel" placeholder="+502 1234 5678" />
+            <input className="input" data-testid="order-phone" value={telefono} onChange={e => setTelefono(e.target.value)} type="tel" placeholder="+502 1234 5678" />
           </label>
 
           <label className="field" style={{ gridColumn: '1 / 3' }}>
@@ -101,7 +101,7 @@ export default function DatosPedido() {
             <textarea className="input" style={{ minHeight: 100, resize: 'vertical' }} value={nota} onChange={e => setNota(e.target.value)} placeholder="Ej: dejar en portería, referencias, etc." />
           </label>
 
-          <button className="btn-primary" type="submit">Guardar y continuar</button>
+          <button className="btn-primary" data-testid="order-submit" type="submit">Guardar y continuar</button>
 
           {error && <p style={{ color: 'red', textAlign: 'center', marginTop: 8 }}>{error}</p>}
         </form>
