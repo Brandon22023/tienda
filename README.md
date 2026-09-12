@@ -602,6 +602,8 @@ Desde la carpeta raíz:
 docker compose up --build
 ```
 
+MySQL is exposed on `localhost:3307` by default to avoid conflicts with a local MySQL installation. To use another host port, run `MYSQL_PORT=3306 docker compose up --build`.
+
 Frontend: `http://localhost:5173` · API: `http://localhost:8000`.
 
 Los productos iniciales se cargan automáticamente al iniciar el backend si la tabla está vacía. Para forzar una carga manual:
