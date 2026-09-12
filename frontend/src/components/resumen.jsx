@@ -10,6 +10,7 @@ export default function Resumen() {
   const [paymentInfo, setPaymentInfo] = useState(null)
   const [finished, setFinished] = useState(false)
    const [orderNumber, setOrderNumber] = useState(null)
+  const [serverTotal, setServerTotal] = useState(null)
   const [generatedAtStr, setGeneratedAtStr] = useState(new Date().toLocaleString())
 
   useEffect(() => {
@@ -26,6 +27,7 @@ export default function Resumen() {
           try {
             const s = JSON.parse(saved)
             setOrderNumber(s.id)
+            setServerTotal(Number(s.total))
             setGeneratedAtStr(new Date(s.fecha).toLocaleString())
           } catch {
             setOrderNumber(null)
@@ -38,7 +40,7 @@ export default function Resumen() {
     }
   }, [])
 
-  const total = cart.reduce((s, it) => s + (Number(it.precio || 0) * Number(it.cantidad || 1)), 0)
+  const total = serverTotal ?? cart.reduce((s, it) => s + (Number(it.precio || 0) * Number(it.cantidad || 1)), 0)
   function generarPDF() {
 
     // proceso: primero guardar pedido en servidor, luego generar PDF con id y fecha del servidor

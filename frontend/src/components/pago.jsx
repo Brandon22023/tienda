@@ -42,13 +42,18 @@ export default function Pago() {
     if (!/^\d{3,4}$/.test(cvc)) return 'CVC inválido.'
     return null
   }
-  async function crearPedidoEnServidor(total) {
+  async function crearPedidoEnServidor() {
     try {
       const clienteRaw = localStorage.getItem('cliente')
       const cliente = clienteRaw ? JSON.parse(clienteRaw) : null
+      const cartRaw = localStorage.getItem('cart')
+      const cart = cartRaw ? JSON.parse(cartRaw) : []
       const body = {
         cliente_id: cliente ? cliente.cliente_id : null,
-        total: Number(total || 0)
+        items: cart.map(it => ({
+          idproductos: Number(it.idproductos ?? it.id ?? 0),
+          cantidad: Number(it.cantidad || 1)
+        }))
       }
       const resp = await fetch(apiUrl('/api/pedidos'), {
         method: 'POST',
@@ -63,13 +68,15 @@ export default function Pago() {
         throw new Error(json?.message || text || `status:${resp.status}`)
       }
       // guardar localmente para que Resumen lo use
-      localStorage.setItem('savedOrder', JSON.stringify({ id: json.id, fecha: json.fecha, total: body.total }))
+      localStorage.setItem('savedOrder', JSON.stringify({ id: json.id, fecha: json.fecha, total: json.total }))
       return json
     } catch (err) {
       console.error('crearPedidoEnServidor exception', err)
       throw err
     }
   }
+  // Compatibilidad con clientes antiguos: los detalles ahora se crean junto con el pedido.
+  // eslint-disable-next-line no-unused-vars
   async function crearDetallesEnServidor(orderId, cart) {
     try {
       if (!orderId) throw new Error('orderId requerido')
@@ -124,11 +131,7 @@ export default function Pago() {
         localStorage.setItem('paymentInfo', JSON.stringify(paymentInfo))
 
         // calcular total desde el carrito y crear pedido en BD ahora
-        const cartRaw = localStorage.getItem('cart')
-        const cart = cartRaw ? JSON.parse(cartRaw) : []
-        const total = cart.reduce((s, it) => s + (Number(it.precio || 0) * Number(it.cantidad || 1)), 0)
-        const pedidoResp = await crearPedidoEnServidor(total)
-        await crearDetallesEnServidor(pedidoResp.id, cart)
+        await crearPedidoEnServidor()
 
         // navegamos al resumen (resumen leerá savedOrder)
         navigate('/resumen')
