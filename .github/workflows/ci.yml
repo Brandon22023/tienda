@@ -19,6 +19,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate Docker Compose
+        working-directory: .
+        run: docker compose config --quiet
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -48,7 +52,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Run tests
-        run: php artisan test
+        run: composer test
 
   frontend:
     name: Frontend checks
