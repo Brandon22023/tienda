@@ -97,13 +97,13 @@
   box-shadow: 0 6px 14px rgba(12,24,48,0.06);
   font-size: 18px;
 }
-.emoji { font-size:18px; }
+.catalogo-icon { color:#122033; }
 .card-txt { line-height:1; }
 .card-name { font-weight:600; color:#0f2340; font-size:0.96rem; }
 .card-desc { font-size:0.82rem; color:#6b7b94; margin-top:4px; }
 
 /* flecha */
-.card-arrow { color:#9aa7c7; font-size:22px; transform: translateY(1px); }
+.card-arrow { color:#9aa7c7; transform: translateY(1px); flex:0 0 auto; }
 
 /* empty state */
 .catalogo-empty { padding: 24px; color:#667892; grid-column: 1/-1; text-align:center; }

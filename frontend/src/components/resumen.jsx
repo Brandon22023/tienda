@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { PartyPopper } from 'lucide-react'
 import logo from '../assets/IMG/logocentral.png'
 import './resumen.css'
 
@@ -139,7 +140,7 @@ export default function Resumen() {
       <div className="summary-page">
         <div className="summary-card thankyou">
           <img src={logo} alt="logo" />
-          <h2>Gracias por tu compra 🎉</h2>
+          <h2 className="thankyou-title"><PartyPopper size={24} strokeWidth={2} aria-hidden="true" />Gracias por tu compra</h2>
           <p>Te redirigiremos al inicio...</p>
         </div>
       </div>

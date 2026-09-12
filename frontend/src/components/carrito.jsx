@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Minus, Plus, Trash2 } from 'lucide-react'
 import './carrito.css'
 
 export default function Carrito() {
@@ -117,7 +118,7 @@ return (
                 </div>
               </div>
               <div>
-                <h3 style={{ margin:0 }}>Tu carrito se siente solo 😢</h3>
+                <h3 style={{ margin:0 }}>Tu carrito se siente solo </h3>
                 <p style={{ margin: '6px 0 0 0', color:'#5f6b7a' }}>¡Hazlo feliz con algunos productos nuevos!</p>
               </div>
             </div>
@@ -132,12 +133,12 @@ return (
                       <div className="cart-item-price">Q {Number(item.precio).toFixed(2)}</div>
                     </div>
                     <div className="cart-item-qty">
-                      <button onClick={() => changeQty(item.idproductos, -1)}>−</button>
+                      <button aria-label="Disminuir cantidad" onClick={() => changeQty(item.idproductos, -1)}><Minus size={16} aria-hidden="true" /></button>
                       <span>{item.cantidad}</span>
-                      <button onClick={() => changeQty(item.idproductos, +1)}>+</button>
+                      <button aria-label="Aumentar cantidad" onClick={() => changeQty(item.idproductos, +1)}><Plus size={16} aria-hidden="true" /></button>
                     </div>
                     <div className="cart-item-total">Q {(Number(item.precio) * Number(item.cantidad)).toFixed(2)}</div>
-                    <button className="cart-item-remove" aria-label="Eliminar" onClick={() => removeItem(item.idproductos)}>🗑</button>
+                    <button className="cart-item-remove" aria-label="Eliminar" onClick={() => removeItem(item.idproductos)}><Trash2 size={18} strokeWidth={2} aria-hidden="true" /></button>
                   </li>
                 ))}
               </ul>

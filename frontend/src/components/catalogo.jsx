@@ -1,14 +1,15 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react'
+import { ChevronRight, HardDrive, Headphones, Keyboard, Laptop, Monitor, Package, Zap } from 'lucide-react'
 import './catalogo.css'
 
 const defaultCats = [
-  { id: 'ram', nombre: 'Memoria Ram', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: '⚡' },
-  { id: 'laptops', nombre: 'Laptops', descripcion: 'Ultrabooks y gamers', color: '#ff9f6f', icon: '💻' },
-  { id: 'perifericos', nombre: 'Periféricos', descripcion: 'Teclados, mice y más', color: '#8be3c3', icon: '⌨️' },
-  { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: '🖥️' },
-  { id: 'almacenamiento', nombre: 'Almacenamiento', descripcion: 'SSD, HDD y NVMe', color: '#ffd36f', icon: '💾' },
-  { id: 'audio', nombre: 'Audio', descripcion: 'Auriculares y parlantes', color: '#7fdcff', icon: '🎧' },
+  { id: 'ram', nombre: 'Memoria Ram', descripcion: 'Módulos DDR4 / DDR5', color: '#6f9cff', icon: Zap },
+  { id: 'laptops', nombre: 'Laptops', descripcion: 'Ultrabooks y gamers', color: '#ff9f6f', icon: Laptop },
+  { id: 'perifericos', nombre: 'Periféricos', descripcion: 'Teclados, mice y más', color: '#8be3c3', icon: Keyboard },
+  { id: 'monitores', nombre: 'Monitores', descripcion: '144Hz, 4K y curvos', color: '#c58bff', icon: Monitor },
+  { id: 'almacenamiento', nombre: 'Almacenamiento', descripcion: 'SSD, HDD y NVMe', color: '#ffd36f', icon: HardDrive },
+  { id: 'audio', nombre: 'Audio', descripcion: 'Auriculares y parlantes', color: '#7fdcff', icon: Headphones },
 ]
 
 export default function Catalogo({ open = false, categorias = [], onSelect = () => {} }) {
@@ -17,7 +18,7 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
     if (!categorias || categorias.length === 0) return defaultCats
     return categorias.map(c => {
       if (typeof c === 'string') {
-        return defaultCats.find(d => d.nombre === c) ?? { id: c, nombre: c, descripcion: '', color: '#ddd', icon: '📦' }
+        return defaultCats.find(d => d.nombre === c) ?? { id: c, nombre: c, descripcion: '', color: '#ddd', icon: Package }
       }
       return c
     })
@@ -78,14 +79,17 @@ export default function Catalogo({ open = false, categorias = [], onSelect = () 
               <div className="card-left">
                 {/* Icono circular con degradado generado desde cat.color */}
                 <div className="card-icon" style={{ background: `linear-gradient(135deg, ${cat.color}33, ${cat.color}88)` }}>
-                  <span className="emoji">{cat.icon}</span>
+                  {(() => {
+                    const Icon = typeof cat.icon === 'function' ? cat.icon : Package
+                    return <Icon className="catalogo-icon" size={22} strokeWidth={2} aria-hidden="true" />
+                  })()}
                 </div>
                 <div className="card-txt">
                   <div className="card-name">{cat.nombre}</div>
                   <div className="card-desc">{cat.descripcion}</div>
                 </div>
               </div>
-              <div className="card-arrow">›</div>
+              <ChevronRight className="card-arrow" size={22} strokeWidth={2} aria-hidden="true" />
             </button>
           ))}
           {filtered.length === 0 && <div className="catalogo-empty">No se encontraron categorías</div>}
