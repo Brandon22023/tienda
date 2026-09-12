@@ -25,15 +25,25 @@ export default function Pago() {
     }
   }
   const [orderInfo, setOrderInfo] = useState(null)
+  const [cart, setCart] = useState([])
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem('orderInfo')
       if (raw) setOrderInfo(JSON.parse(raw))
+      const cartRaw = localStorage.getItem('cart')
+      const savedCart = cartRaw ? JSON.parse(cartRaw) : []
+      setCart(Array.isArray(savedCart) ? savedCart : [])
     } catch {
       setOrderInfo(null)
+      setCart([])
     }
   }, [])
+
+  const cartTotal = cart.reduce(
+    (total, item) => total + Number(item.precio || 0) * Number(item.cantidad || 1),
+    0
+  )
 
   function validarTarjeta() {
     if (!cardName.trim()) return 'Nombre en la tarjeta es requerido.'
@@ -191,6 +201,29 @@ export default function Pago() {
                 <div><strong>Correo:</strong> {orderInfo.correo}</div>
                 <div><strong>Dirección:</strong> {orderInfo.direccion}</div>
                 {orderInfo.nota && <div><strong>Nota:</strong> {orderInfo.nota}</div>}
+              </div>
+              <div className="checkout-items" aria-label="Artículos del pedido">
+                <div className="checkout-items-title">Artículos</div>
+                {cart.length > 0 ? cart.map(item => {
+                  const quantity = Number(item.cantidad || 1)
+                  const price = Number(item.precio || 0)
+                  return (
+                    <div className="checkout-item" key={item.idproductos}>
+                      <img src={item.image_url} alt="" className="checkout-item-image" />
+                      <div className="checkout-item-details">
+                        <strong>{item.nombre}</strong>
+                        <span>Cantidad: {quantity} · Precio unitario: Q {price.toFixed(2)}</span>
+                      </div>
+                      <strong className="checkout-item-subtotal">Q {(price * quantity).toFixed(2)}</strong>
+                    </div>
+                  )
+                }) : (
+                  <p className="checkout-items-empty">No hay artículos en el carrito.</p>
+                )}
+                <div className="checkout-total">
+                  <span>Total del pedido</span>
+                  <strong>Q {cartTotal.toFixed(2)}</strong>
+                </div>
               </div>
             </div>
           )}

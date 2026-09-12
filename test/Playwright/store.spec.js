@@ -92,6 +92,10 @@ test.describe('Electrocore - flujo integral de tienda', () => {
     }, { product })
 
     await page.goto('/pago')
+    await expect(page.getByRole('region', { name: /artículos del pedido/i })).toBeVisible()
+    await expect(page.getByText(product.nombre, { exact: true })).toBeVisible()
+    await expect(page.getByText('Cantidad: 1', { exact: true })).toBeVisible()
+    await expect(page.getByText('Total del pedido', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: /continuar con efectivo/i }).click()
     await expect(page).toHaveURL(/\/resumen$/)
     await expect(page.getByText('Resumen de compra')).toBeVisible()
