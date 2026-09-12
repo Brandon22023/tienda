@@ -57,7 +57,7 @@ export default function Pago() {
       }
       const resp = await fetch(apiUrl('/api/pedidos'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(body)
       })
       const text = await resp.text()

@@ -19,7 +19,7 @@ export default function IniciarSesion() {
     try {
       const resp = await fetch(apiUrl('/api/login'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ correo, password })
       })
       const json = await resp.json()

@@ -22,7 +22,7 @@ export default function Registrarse() {
     try {
       const resp = await fetch(apiUrl('/api/register'), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           nombre,
           correo,
