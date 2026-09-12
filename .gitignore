@@ -2,3 +2,5 @@ test/.phpunit.result.cache
 .env
 .env.*
 !.env.example
+test/Playwright/browsers
+test/Playwright/results
