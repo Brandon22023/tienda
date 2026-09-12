@@ -58,6 +58,15 @@ ejecuta una carga inicial controlada y despues se mantiene
 Render inyecta `PORT`; el `CMD` de `Backend/Dockerfile` lo respeta y escucha en
 `0.0.0.0`, como necesita un servicio web Docker.
 
+El entrypoint ejecuta las migraciones al iniciar. Despues de que el servicio
+este saludable, usa el Render Shell para cargar los productos una sola vez:
+
+```bash
+php artisan db:seed --force
+```
+
+Luego conserva `SEED_ON_STARTUP=false`.
+
 ## Vercel
 
 Configura `frontend/` como Root Directory del proyecto Vercel. El archivo
