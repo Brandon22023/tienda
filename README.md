@@ -604,7 +604,7 @@ docker compose up --build
 
 Frontend: `http://localhost:5173` · API: `http://localhost:8000`.
 
-Para cargar los productos iniciales:
+Los productos iniciales se cargan automáticamente al iniciar el backend si la tabla está vacía. Para forzar una carga manual:
 
 ```bash
 docker compose exec backend php artisan db:seed --force

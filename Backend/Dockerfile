@@ -13,9 +13,12 @@ RUN apk add --no-cache icu-libs oniguruma libzip \
 
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs \
+    && chmod +x /usr/local/bin/docker-entrypoint \
     && chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 8000
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
