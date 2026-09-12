@@ -1,4 +1,7 @@
-FROM composer:2 AS vendor
+# Keep Composer's PHP version aligned with the application runtime. The current
+# lock file contains packages that support PHP 8.1 through 8.4, while the
+# floating composer:2 image can move to PHP 8.5 and reject the lock file.
+FROM composer:2.8 AS vendor
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --optimize-autoloader
