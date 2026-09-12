@@ -4,6 +4,13 @@
 
 Tienda es una plataforma de comercio electrónico de pila completa que permite a los usuarios navegar por un catálogo de productos, crear cuentas, gestionar carrito de compras y completar pedidos. La aplicación está construida con Laravel 12 en el backend y React 19 en el frontend, proporcionando una experiencia moderna, segura y altamente receptiva.
 
+## Preparación para despliegue
+
+La configuración actual queda preparada para PostgreSQL/Supabase + Render
+(backend) y Vercel (frontend). Consulta [DEPLOYMENT.md](DEPLOYMENT.md) para
+las variables, el flujo de datos, Docker local y los pasos previos al primer
+despliegue. No se incluyen credenciales ni dominios reales.
+
 ## Características Principales
 
 - Catálogo de productos con filtrado por categoría y precio
@@ -21,7 +28,7 @@ Tienda es una plataforma de comercio electrónico de pila completa que permite a
 - Node.js 16 o superior
 - Composer
 - npm o yarn
-- SQLite (predeterminado) o MySQL
+- PostgreSQL (produccion/Supabase), MySQL (DDL historico) o SQLite (pruebas)
 
 ## Estructura del Proyecto
 
@@ -122,7 +129,7 @@ Configura estos secretos antes de ejecutar `Deploy`:
 - `DEPLOY_PATH`
 - `DEPLOY_USER`
 - `DEPLOY_SSH_KEY`
-- `VITE_API_BASE_URL`
+- `VITE_API_URL`
 - `LARAVEL_APP_KEY`
 - `LARAVEL_APP_URL`
 - `LARAVEL_DB_CONNECTION`
@@ -142,7 +149,8 @@ Si solo quieres probar el pipeline en GitHub y no tienes servidor todavía, abre
 
 ### Variables del frontend
 
-El frontend ya usa `VITE_API_BASE_URL`. En local puede apuntar a `http://127.0.0.1:8000` y en producción al dominio real del backend.
+El frontend usa `VITE_API_URL`. En Docker queda vacía y nginx reenvía `/api`
+al backend; en Vercel debe contener el origen completo del backend real.
 
 ## Pruebas React
 
@@ -538,7 +546,7 @@ En el siguiente video se presenta una demostración completa del flujo de usuari
 | ----------------- | ------- | ------------------- |
 | Laravel Framework | 12.0    | Framework principal |
 | PHP               | 8.2+    | Lenguaje base       |
-| MySQL             | -       | Base de datos       |
+| PostgreSQL        | -       | Base de datos de produccion |
 | PHPUnit           | 11.5.3  | Testing             |
 | Pint              | 1.13    | Linter PHP          |
 | Laravel Tinker    | 2.10.1  | REPL interactivo    |
@@ -558,7 +566,7 @@ En el siguiente video se presenta una demostración completa del flujo de usuari
 - La aplicación detecta automáticamente el nombre de la columna de contraseña en la tabla cliente para mayor flexibilidad
 - Los archivos de log se almacenan en `Backend/storage/logs/`
 - El carrito del usuario se persiste automáticamente en el navegador mediante localStorage
-- Se utiliza MYSQL para facilitar la configuración local
+- Docker local usa PostgreSQL; `Database/DDL.sql` se conserva como export histórico de MySQL Workbench
 - Cada componente React incluye su propio archivo CSS asociado
 
 ## Resolución de Problemas Comunes
@@ -602,10 +610,12 @@ Desde la carpeta raíz:
 docker compose up --build
 ```
 
-MySQL is exposed on `localhost:3307` by default to avoid conflicts with a local MySQL installation. To use another host port in PowerShell, set `$env:MYSQL_PORT` before starting Compose:
+PostgreSQL is exposed on `localhost:5433` by default to avoid conflicts with
+an existing local database. To use another host port in PowerShell, set
+`$env:POSTGRES_PORT` before starting Compose:
 
 ```powershell
-$env:MYSQL_PORT = "3308"
+$env:POSTGRES_PORT = "5434"
 docker compose up --build
 ```
 
@@ -617,7 +627,8 @@ Los productos iniciales se cargan automáticamente al iniciar el backend si la t
 docker compose exec backend php artisan db:seed --force
 ```
 
-Los datos de MySQL se conservan en el volumen `mysql_data`. Para eliminar también ese volumen usa `docker compose down -v`.
+Los datos de PostgreSQL se conservan en el volumen `postgres_data`. Para
+eliminar también ese volumen usa `docker compose down -v`.
 
 ## Licencia
 

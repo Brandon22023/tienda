@@ -1,11 +1,15 @@
 # Informe QA — Electrocore
 
 Fecha de ejecución: 2026-09-12  
-Entorno: Windows 11 x64, Docker Desktop, frontend en `http://localhost:5173`, backend en `http://localhost:8000`, MySQL en `localhost:3307`.
+Entorno: Windows 11 x64, Docker Desktop, frontend en `http://localhost:5173`, backend en `http://localhost:8000`, PostgreSQL 16 en `localhost:5433`.
 
 ## Resumen ejecutivo
 
-La aplicación levanta correctamente con Docker y el entrypoint carga los datos iniciales cuando la tabla de productos está vacía. La API respondió 10 productos desde `/api/inicio`.
+La aplicación levanta correctamente con Docker y el entrypoint carga los datos iniciales cuando la tabla de productos está vacía. La API respondió 10 productos desde `/api/inicio`; el catálogo completo contiene 14 productos en PostgreSQL.
+
+La verificación de despliegue también confirmó que el proxy nginx del frontend
+responde `/api/catalogo` y que el contenedor backend tiene activa la extensión
+`pdo_pgsql`.
 
 Resultados ejecutados:
 
