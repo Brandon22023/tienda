@@ -34,9 +34,6 @@ class RegisterController extends Controller
         }
 
         // LOG de depuración
-        Log::info('RegisterController payload', $data);
-        Log::info('RegisterController passwordColumn: '.$passwordColumn);
-
         try {
             $id = DB::table('cliente')->insertGetId([
                 'nombre'     => $data['nombre'],
@@ -47,8 +44,8 @@ class RegisterController extends Controller
 
             return response()->json(['message'=>'Registro creado','cliente_id'=>$id], 201);
         } catch (Exception $e) {
-            Log::error('RegisterController::register error: '.$e->getMessage());
-            return response()->json(['message'=>'Error interno al crear el registro','error'=>$e->getMessage()], 500);
+            Log::error('RegisterController::register error', ['exception' => $e->getMessage()]);
+            return response()->json(['message'=>'Error interno al crear el registro'], 500);
         }
     }
 }
