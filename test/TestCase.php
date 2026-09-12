@@ -6,5 +6,5 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    //
+    // Laravel 12 descubre automáticamente Backend/bootstrap/app.php.
 }

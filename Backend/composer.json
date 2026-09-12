@@ -28,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "Tests\\": "../test/"
         }
     },
     "scripts": {
@@ -54,7 +54,7 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php vendor/bin/phpunit -c ../test/phpunit.xml"
         ]
     },
     "extra": {
