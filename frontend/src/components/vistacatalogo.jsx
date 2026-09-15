@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import './vistacatalogo.css'
 import { apiUrl } from '../lib/api.js'
+import { getFavoriteIds, toggleFavorite } from '../lib/favorites.js'
 export default function Vistacatalogo() {
   const { categoriaId } = useParams();
   const [productosCategoria, setProductosCategoria] = useState([]);
@@ -10,6 +11,7 @@ export default function Vistacatalogo() {
   //aqui se ordenara segun el precio
    const [menuOpen, setMenuOpen] = useState(false);
   const [selected, setSelected] = useState('defecto'); // solo para mostrar selección UI
+  const [favoriteIds, setFavoriteIds] = useState(getFavoriteIds())
   const menuRef = useRef(null);
 
   // Resetear orden a "defecto" cada vez que se cambia de categoría
@@ -52,10 +54,10 @@ export default function Vistacatalogo() {
        if (encontrados.length === 0) {
          encontrados = all.filter(p => normalizeSlug(p.categoria).includes(normalizeSlug(categoriaId)))
        }
-       // Fallback: si aún no hay nada, mostrar todos para ver qué trae la API (útil en pruebas)
-       if (encontrados.length === 0) {
-         console.warn('No se encontraron productos para la categoría, mostrando todos (revisa categorías en DB/API)')
-         encontrados = all
+        // Una categoría inexistente debe mostrar un estado vacío, no mezclar productos de otras categorías.
+        if (encontrados.length === 0) {
+          console.warn('No se encontraron productos para la categoría')
+          encontrados = []
        }
        setProductosCategoria(encontrados);
       } catch (e) {
@@ -176,6 +178,9 @@ export default function Vistacatalogo() {
             <li key={p.idproductos} className="vc-item" data-testid="product-card">
             <img src={p.image_url} alt={p.nombre} className="vc-list-img" />
             <button className="btn-agregar" data-testid="product-add-to-cart" onClick={() => agregarAlCarrito(p)}>Agregar al carrito</button>
+            <button className="favorite-btn" aria-label={favoriteIds.includes(Number(p.idproductos)) ? 'Quitar de favoritos' : 'Agregar a favoritos'} onClick={() => setFavoriteIds(toggleFavorite(p.idproductos))}>
+              {favoriteIds.includes(Number(p.idproductos)) ? '♥ Favorito' : '♡ Favorito'}
+            </button>
             <div style={{ fontWeight:700 }}>{p.nombre}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.categoria}</div>
             <div style={{ color:'#666', fontSize:13 }}>{p.descripcion}</div>

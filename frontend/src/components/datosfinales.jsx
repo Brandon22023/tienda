@@ -74,3 +74,4 @@ function datosfinales() {
 }
 
 export default datosfinales
+import React from 'react'

@@ -1,5 +1,6 @@
+import React from 'react'
 import logoPM from './assets/IMG/logocentral.png'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import './App.css'
 import Datosfinales from './components/datosfinales.jsx'
 import Categoria from './components/catalogo.jsx'
@@ -10,8 +11,11 @@ import Carrito from './components/carrito.jsx'
 import Pedido from './components/pedidos.jsx'
 import Pago from './components/pago.jsx'
 import Resumen from './components/resumen.jsx'
+import Favoritos from './components/favoritos.jsx'
+import HistorialPedidos from './components/historial.jsx'
 import { useState, useEffect } from 'react'
 import { apiUrl } from './lib/api.js'
+import { getFavoriteIds, toggleFavorite } from './lib/favorites.js'
 
 function App() {
   // Mensaje general traído desde /api/inicio
@@ -21,8 +25,12 @@ function App() {
   const [error, setError] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [cliente, setCliente] = useState(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [favoriteIds, setFavoriteIds] = useState([])
   const categorias = ['Memoria Ram','Laptops','Periféricos','Monitores','Almacenamiento','Audio']
   const navigate = useNavigate()
+  const location = useLocation()
   
   const [cartCount, setCartCount] = useState(0)
  const [badgePulse, setBadgePulse] = useState(false)
@@ -56,7 +64,7 @@ function App() {
      try {
        const raw = localStorage.getItem('cart')
        const arr = raw ? JSON.parse(raw) : []
-       const newCount = Array.isArray(arr) ? arr.length : 0
+        const newCount = Array.isArray(arr) ? arr.reduce((sum, item) => sum + Number(item.cantidad || 0), 0) : 0
 
        setCartCount(newCount)
        if (newCount > 0) {
@@ -70,8 +78,16 @@ function App() {
 
    readCartCount()
    function onUpdate() { readCartCount() }
+   function onClear() {
+     localStorage.removeItem('cart')
+     readCartCount()
+   }
    window.addEventListener('cart-updated', onUpdate)
-   return () => window.removeEventListener('cart-updated', onUpdate)
+   window.addEventListener('cart-cleared', onClear)
+   return () => {
+     window.removeEventListener('cart-updated', onUpdate)
+     window.removeEventListener('cart-cleared', onClear)
+   }
  }, [])
 
   useEffect(() => {
@@ -85,30 +101,53 @@ function App() {
   }, [])
 
   // Nuevo: manejar clic en el botón de usuario (mostrar advertencia de cerrar sesión)
+  useEffect(() => {
+    const query = new URLSearchParams(location.search).get('q') || ''
+    setSearchInput(query)
+    setSearchTerm(query.trim().toLowerCase())
+  }, [location.search])
+
+  useEffect(() => {
+    function readFavorites() { setFavoriteIds(getFavoriteIds()) }
+    readFavorites()
+    window.addEventListener('favorites-updated', readFavorites)
+    return () => window.removeEventListener('favorites-updated', readFavorites)
+  }, [])
+
+  function submitSearch(event) {
+    event.preventDefault()
+    const query = searchInput.trim()
+    navigate(query ? `/?q=${encodeURIComponent(query)}` : '/')
+  }
+
+  function toggleProductFavorite(id) {
+    setFavoriteIds(toggleFavorite(id))
+  }
+
   function handleCuentaClick() {
     if (!cliente) {
       navigate('/login')
       return
     }
-    const ok = window.confirm('¿Deseas cerrar sesión?')
-    if (ok) {
-      localStorage.removeItem('cliente')
-      // recargar para reflejar estado cerrado
-      window.location.href = '/'
-    }
-    // si el usuario cancela, no hacer nada
+    navigate('/mis-pedidos')
   }
   useEffect(() => {
     async function cargar() {
       try {
-        const resp = await fetch(apiUrl('/api/inicio'))
+        const endpoint = searchTerm ? '/api/catalogo' : '/api/inicio'
+        const resp = await fetch(apiUrl(endpoint))
         if (!resp.ok) {
           const txt = await resp.text()
           throw new Error(`Error inicio (${resp.status}) ${txt}`)
         }
         const json = await resp.json()
-        setProductosInicio(Array.isArray(json.productos) ? json.productos : [])
-        setMensaje(json.mensaje)
+        const products = Array.isArray(json.productos) ? json.productos : []
+        const normalized = searchTerm.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        const filtered = searchTerm
+          ? products.filter(product => `${product.nombre} ${product.descripcion || ''} ${product.categoria || ''}`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalized))
+          : products
+        setProductosInicio(filtered)
+        setMensaje(searchTerm ? { titulo: `Resultados para “${searchTerm}”` } : json.mensaje)
       } catch (e) {
         setError(e.message)
       } finally {
@@ -116,7 +155,7 @@ function App() {
       }
     }
     cargar()
-  }, [])
+  }, [searchTerm])
 
   useEffect(() => {
     // Función para detectar si estamos al final del scroll
@@ -198,12 +237,12 @@ function App() {
               onKeyDown={(e) => { if (e.key === 'Enter') navigate('/') }}
             />
           </div>
-          <div className="header-center">
-            <input type="text" className="buscador-input" data-testid="store-search" placeholder="Buscar en la tienda..." />
-            <button className="buscador-btn" data-testid="store-search-submit" aria-label="Buscar">
+          <form className="header-center" onSubmit={submitSearch}>
+            <input type="text" className="buscador-input" data-testid="store-search" value={searchInput} onChange={event => setSearchInput(event.target.value)} placeholder="Buscar en la tienda..." />
+            <button type="submit" className="buscador-btn" data-testid="store-search-submit" aria-label="Buscar">
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="9" r="7"/><line x1="16" y1="16" x2="13.5" y2="13.5"/></svg>
             </button>
-          </div>
+          </form>
           <div className="header-right">
 
 
@@ -235,11 +274,11 @@ function App() {
             )}
 
 
-            <button className="icon-btn" data-testid="favorites-button">
+            <button className="icon-btn" data-testid="favorites-button" onClick={() => navigate('/favoritos')}>
               <svg className="cart-icon-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4b70cf" strokeWidth="2" xmlns="http://www.w3.org/2000/svg">
               <path d="M16.5 7.5a4.5 4.5 0 0 0-9 0c0 4.5 4.5 7.5 4.5 7.5s4.5-3 4.5-7.5z"/>
               </svg>
-              <span>Favoritos</span>
+               <span>Favoritos{favoriteIds.length ? ` (${favoriteIds.length})` : ''}</span>
             </button>
             <button className="icon-btn cart-btn" data-testid="cart-button"
               onClick={() => navigate('/carrito')}
@@ -282,6 +321,9 @@ function App() {
                         <div className="producto-nombre">{p.nombre}</div>
                         <div className="producto-categoria">{p.categoria}</div>
                         <div className="producto-precio">Q {Number(p.precio).toFixed(2)}</div>
+                        <button className="favorite-btn" data-testid="home-favorite" aria-label={favoriteIds.includes(Number(p.idproductos)) ? 'Quitar de favoritos' : 'Agregar a favoritos'} onClick={() => toggleProductFavorite(p.idproductos)}>
+                          {favoriteIds.includes(Number(p.idproductos)) ? '♥' : '♡'}
+                        </button>
                         <button className="producto-add" data-testid="home-add-to-cart" onClick={() => addToCart(p, 1)}>Agregar al carrito</button>
                       </div>
                     </article>
@@ -291,13 +333,15 @@ function App() {
             )}
           </main>
         } />
-        <Route path="/:categoriaId" element={<Vistacatalogo categorias={categorias} />} />
-        <Route path="/login" element={<IniciarSesion />} />
+         <Route path="/login" element={<IniciarSesion />} />
         <Route path="/register" element={<Registrarse />} />
         <Route path="/carrito" element={<Carrito/>} />
         <Route path="/pedidos" element={<Pedido />} />
         <Route path="/pago" element={<Pago />} />
-        <Route path="/resumen" element={<Resumen />} />
+         <Route path="/resumen/:orderId" element={<Resumen />} />
+         <Route path="/favoritos" element={<Favoritos />} />
+         <Route path="/mis-pedidos" element={<HistorialPedidos />} />
+         <Route path="/:categoriaId" element={<Vistacatalogo categorias={categorias} />} />
       </Routes>
 
       <footer className="footer">

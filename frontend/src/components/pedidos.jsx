@@ -44,9 +44,7 @@ export default function DatosPedido() {
       nota,
       createdAt: new Date().toISOString()
     }
-    localStorage.setItem('orderInfo', JSON.stringify(orderInfo))
-    // redirigir al siguiente paso de checkout (pago/resumen). Ajusta según tu flujo.
-    navigate('/pago') // o la ruta que uses para pago
+    navigate('/pago', { state: { orderInfo } })
   }
 
   return (

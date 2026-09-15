@@ -1,12 +1,13 @@
 // ...existing code...
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import logoPM from '../assets/IMG/logocentral.png'
 import './iniciar_sesion.css'
 import { apiUrl } from '../lib/api.js'
 
 export default function IniciarSesion() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,8 +29,9 @@ export default function IniciarSesion() {
       // Guardar usuario mínimo en localStorage para mostrar nombre en header
       const cliente = { cliente_id: json.cliente_id, nombre: json.nombre, correo, telefono: json.telefono }
       localStorage.setItem('cliente', JSON.stringify(cliente))
+      localStorage.setItem('auth_token', json.token)
 
-      window.location.href = '/'
+      window.location.href = location.state?.returnTo || '/'
     } catch (err) {
       setError(err.message)
     } finally {

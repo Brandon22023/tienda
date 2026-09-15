@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import './pago.css'
-import { apiUrl } from '../lib/api.js'
+import { apiFetch } from '../lib/api.js'
 
 export default function Pago() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [method, setMethod] = useState('efectivo') // 'efectivo' | 'tarjeta'
   const [cardName, setCardName] = useState('')
   const [cardNumber, setCardNumber] = useState('')
@@ -29,8 +30,14 @@ export default function Pago() {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('orderInfo')
-      if (raw) setOrderInfo(JSON.parse(raw))
+      const stateInfo = location.state?.orderInfo
+      if (stateInfo) {
+        setOrderInfo(stateInfo)
+      } else {
+        // Compatibilidad con enlaces directos de las suites E2E antiguas.
+        const rawOrder = localStorage.getItem('orderInfo')
+        setOrderInfo(rawOrder ? JSON.parse(rawOrder) : null)
+      }
       const cartRaw = localStorage.getItem('cart')
       const savedCart = cartRaw ? JSON.parse(cartRaw) : []
       setCart(Array.isArray(savedCart) ? savedCart : [])
@@ -38,7 +45,7 @@ export default function Pago() {
       setOrderInfo(null)
       setCart([])
     }
-  }, [])
+  }, [location.state])
 
   const cartTotal = cart.reduce(
     (total, item) => total + Number(item.precio || 0) * Number(item.cantidad || 1),
@@ -54,18 +61,13 @@ export default function Pago() {
   }
   async function crearPedidoEnServidor() {
     try {
-      const clienteRaw = localStorage.getItem('cliente')
-      const cliente = clienteRaw ? JSON.parse(clienteRaw) : null
-      const cartRaw = localStorage.getItem('cart')
-      const cart = cartRaw ? JSON.parse(cartRaw) : []
       const body = {
-        cliente_id: cliente ? cliente.cliente_id : null,
         items: cart.map(it => ({
           idproductos: Number(it.idproductos ?? it.id ?? 0),
           cantidad: Number(it.cantidad || 1)
         }))
       }
-      const resp = await fetch(apiUrl('/api/pedidos'), {
+      const resp = await apiFetch('/api/pedidos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(body)
@@ -77,49 +79,25 @@ export default function Pago() {
         console.error('Crear pedido falló', resp.status, text)
         throw new Error(json?.message || text || `status:${resp.status}`)
       }
-      // guardar localmente para que Resumen lo use
-      localStorage.setItem('savedOrder', JSON.stringify({ id: json.id, fecha: json.fecha, total: json.total }))
       return json
     } catch (err) {
       console.error('crearPedidoEnServidor exception', err)
       throw err
     }
   }
-  // Compatibilidad con clientes antiguos: los detalles ahora se crean junto con el pedido.
-  // eslint-disable-next-line no-unused-vars
-  async function crearDetallesEnServidor(orderId, cart) {
-    try {
-      if (!orderId) throw new Error('orderId requerido')
-      const items = (cart || []).map(it => ({
-        idpedidos: Number(orderId),
-        idproductos: Number(it.idproductos ?? it.id ?? 0),
-        cantidad: Number(it.cantidad || 1),
-        precio_unitario: Number(it.precio || 0)
-      }))
-      const resp = await fetch(apiUrl(`/api/pedidos/${orderId}/detalles`), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items })
-      })
-      const text = await resp.text()
-      let json = null
-      try { json = text ? JSON.parse(text) : null } catch { json = null }
-      if (!resp.ok) {
-        console.error('Crear detalles falló', resp.status, text)
-        throw new Error(json?.message || text || `status:${resp.status}`)
-      }
-      return json
-    } catch (err) {
-      console.error('crearDetallesEnServidor exception', err)
-      throw err
-    }
-  }
-
   function handleSubmit(e) {
     e.preventDefault()
     setFormErrorSafe(null);
     (async () => {
       try {
+        if (!orderInfo) {
+          setFormErrorSafe('Completa los datos del pedido antes de pagar.')
+          return
+        }
+        if (cart.length === 0) {
+          setFormErrorSafe('Agrega al menos un artículo antes de pagar.')
+          return
+        }
         if (method === 'tarjeta') {
           const err = validarTarjeta()
           if (err) {
@@ -138,13 +116,10 @@ export default function Pago() {
           } : null,
           savedAt: new Date().toISOString()
         }
-        localStorage.setItem('paymentInfo', JSON.stringify(paymentInfo))
+        const order = await crearPedidoEnServidor()
 
-        // calcular total desde el carrito y crear pedido en BD ahora
-        await crearPedidoEnServidor()
-
-        // navegamos al resumen (resumen leerá savedOrder)
-        navigate('/resumen')
+        // El resumen consulta el pedido recién creado directamente al servidor.
+        navigate(`/resumen/${order.id}`, { state: { orderInfo, paymentInfo } })
       } catch {
         alert('No se pudo guardar el pedido en el servidor. Revisa la consola del navegador y los logs del backend.')
       }
@@ -202,31 +177,32 @@ export default function Pago() {
                 <div><strong>Dirección:</strong> {orderInfo.direccion}</div>
                 {orderInfo.nota && <div><strong>Nota:</strong> {orderInfo.nota}</div>}
               </div>
-              <div className="checkout-items" data-testid="checkout-items" aria-label="Artículos del pedido">
-                <div className="checkout-items-title">Artículos</div>
-                {cart.length > 0 ? cart.map(item => {
-                  const quantity = Number(item.cantidad || 1)
-                  const price = Number(item.precio || 0)
-                  return (
-                    <div className="checkout-item" data-testid="checkout-item" key={item.idproductos}>
-                      <img src={item.image_url} alt="" className="checkout-item-image" />
-                      <div className="checkout-item-details">
-                        <strong>{item.nombre}</strong>
-                        <span>Cantidad: {quantity} · Precio unitario: Q {price.toFixed(2)}</span>
-                      </div>
-                      <strong className="checkout-item-subtotal">Q {(price * quantity).toFixed(2)}</strong>
-                    </div>
-                  )
-                }) : (
-                  <p className="checkout-items-empty">No hay artículos en el carrito.</p>
-                )}
-                <div className="checkout-total">
-                  <span>Total del pedido</span>
-                  <strong>Q {cartTotal.toFixed(2)}</strong>
-                </div>
-              </div>
             </div>
           )}
+
+          <div className="checkout-items" data-testid="checkout-items" aria-label="Artículos del pedido" style={{ gridColumn: '1 / 3' }}>
+            <div className="checkout-items-title">Artículos</div>
+            {cart.length > 0 ? cart.map(item => {
+              const quantity = Number(item.cantidad || 1)
+              const price = Number(item.precio || 0)
+              return (
+                <div className="checkout-item" data-testid="checkout-item" key={item.idproductos}>
+                  <img src={item.image_url} alt="" className="checkout-item-image" />
+                  <div className="checkout-item-details">
+                    <strong>{item.nombre}</strong>
+                    <span>Cantidad: {quantity} · Precio unitario: Q {price.toFixed(2)}</span>
+                  </div>
+                  <strong className="checkout-item-subtotal">Q {(price * quantity).toFixed(2)}</strong>
+                </div>
+              )
+            }) : (
+              <p className="checkout-items-empty">No hay artículos en el carrito.</p>
+            )}
+            <div className="checkout-total">
+              <span>Total del pedido</span>
+              <strong>Q {cartTotal.toFixed(2)}</strong>
+            </div>
+          </div>
 
           {method === 'tarjeta' && (
             <>

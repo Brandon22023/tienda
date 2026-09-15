@@ -75,7 +75,7 @@ export default function Carrito() {
 
    function chooseLogin() {
    setShowLoginPrompt(false)
-   navigate('/login')
+   navigate('/login', { state: { returnTo: '/pedidos' } })
  }
 
  function chooseGuest() {

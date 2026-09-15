@@ -16,3 +16,12 @@ export function apiUrl(path) {
   if (!API_BASE_URL) return normalizedPath || '/'
   return `${API_BASE_URL}${normalizedPath}`
 }
+
+export function apiFetch(path, options = {}) {
+  const token = localStorage.getItem('auth_token')
+  const headers = new Headers(options.headers || {})
+  headers.set('Accept', 'application/json')
+  if (token) headers.set('Authorization', `Bearer ${token}`)
+
+  return fetch(apiUrl(path), { ...options, headers })
+}
