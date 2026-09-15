@@ -31,6 +31,17 @@ describe('App', () => {
           })
         }
       }
+      if (String(input).includes('/api/catalogo')) {
+        return {
+          ok: true,
+          json: async () => ({
+            productos: [
+              { idproductos: 1, nombre: 'Laptop Demo', categoria: 'Laptops', precio: 1234.5, image_url: 'https://example.com/laptop.jpg' },
+              { idproductos: 2, nombre: 'Mouse Gamer', categoria: 'Periféricos', precio: 99, image_url: 'https://example.com/mouse.jpg' }
+            ]
+          })
+        }
+      }
       throw new Error(`Unexpected fetch: ${input}`)
     })
   })
@@ -83,5 +94,34 @@ describe('App', () => {
     container.querySelector('.cart-btn')?.click()
 
     expect(await screen.findByText('Mi Carrito')).toBeInTheDocument()
+  })
+
+  it('busca productos en el catálogo completo', async () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    )
+
+    const search = await screen.findByTestId('store-search')
+    fireEvent.change(search, { target: { value: 'Mouse' } })
+    fireEvent.click(screen.getByTestId('store-search-submit'))
+
+    expect(await screen.findByText('Mouse Gamer')).toBeInTheDocument()
+    expect(screen.queryByText('Laptop Demo')).not.toBeInTheDocument()
+  })
+
+  it('guarda favoritos y muestra su pantalla', async () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <App />
+      </MemoryRouter>
+    )
+
+    await screen.findAllByText('Laptop Demo')
+    fireEvent.click(screen.getAllByTestId('home-favorite')[0])
+    fireEvent.click(screen.getByTestId('favorites-button'))
+
+    expect(await screen.findByTestId('favorite-card')).toBeInTheDocument()
   })
 })

@@ -25,7 +25,7 @@ La configuración usa Chrome instalado en el equipo mediante `channel: chrome`. 
 Puedes cambiar las URLs sin modificar las pruebas:
 
 ```bash
-set PLAYWRIGHT_BASE_URL=http://localhost:5173
-set PLAYWRIGHT_API_URL=http://localhost:8000
+set PLAYWRIGHT_BASE_URL=http://127.0.0.1:5173
+set PLAYWRIGHT_API_URL=http://127.0.0.1:8000
 npm run test:e2e
 ```

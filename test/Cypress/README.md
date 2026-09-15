@@ -8,4 +8,4 @@ Desde `frontend`:
 npm run test:cypress
 ```
 
-Para cambiar el frontend: `CYPRESS_BASE_URL=http://localhost:5173 npm run test:cypress`.
+Para cambiar el frontend: define `CYPRESS_BASE_URL` antes de ejecutar `npm run test:cypress`.

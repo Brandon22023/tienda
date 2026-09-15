@@ -1,6 +1,6 @@
 import { test, expect } from '../../frontend/node_modules/@playwright/test/index.mjs'
 
-const apiBaseUrl = process.env.PLAYWRIGHT_API_URL || 'http://localhost:8000'
+const apiBaseUrl = process.env.PLAYWRIGHT_API_URL || 'http://127.0.0.1:8000'
 
 test.describe('Electrocore - flujo integral de tienda', () => {
   test('carga el inicio y muestra productos desde la API', async ({ page }) => {
@@ -97,7 +97,7 @@ test.describe('Electrocore - flujo integral de tienda', () => {
     await expect(page.getByText(/Cantidad: 1/).first()).toBeVisible()
     await expect(page.getByText('Total del pedido', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: /continuar con efectivo/i }).click()
-    await expect(page).toHaveURL(/\/resumen$/)
+    await expect(page).toHaveURL(/\/resumen\/\d+$/)
     await expect(page.getByText('Resumen de compra')).toBeVisible()
     await expect(page.getByText(/N.*pedido:/i)).toBeVisible()
   })

@@ -49,16 +49,17 @@ class StoreFlowTest extends TestCase
         ]);
         $register->assertCreated()->assertJsonPath('cliente_id', 1);
 
-        $this->postJson('/api/login', [
+        $login = $this->postJson('/api/login', [
             'correo' => 'ana@example.com',
             'password' => 'password123',
         ])->assertOk()->assertJsonPath('nombre', 'Ana Integracion');
+        $token = $login->json('token');
 
         $product = $this->createProduct(price: 250, stock: 4);
         $this->getJson('/api/inicio')->assertOk()->assertJsonStructure(['mensaje', 'productos']);
         $this->getJson('/api/catalogo')->assertOk()->assertJsonPath('productos.0.idproductos', $product);
 
-        $order = $this->postJson('/api/pedidos', [
+        $order = $this->withToken($token)->postJson('/api/pedidos', [
             'cliente_id' => 1,
             'items' => [['idproductos' => $product, 'cantidad' => 2]],
             'total' => 0,
@@ -87,6 +88,66 @@ class StoreFlowTest extends TestCase
         ])->assertCreated()->assertJsonPath('total', 75);
 
         $this->assertDatabaseHas('pedidos', ['cliente_id' => null, 'total' => 75]);
+    }
+
+    public function test_guest_cannot_assign_an_order_to_another_customer(): void
+    {
+        $product = $this->createProduct();
+        $this->createCustomer('owner@example.com');
+
+        $this->postJson('/api/pedidos', [
+            'cliente_id' => 1,
+            'items' => [['idproductos' => $product, 'cantidad' => 1]],
+        ])->assertUnauthorized();
+    }
+
+    public function test_authenticated_customer_can_read_own_order_history(): void
+    {
+        $customer = $this->createCustomer('history@example.com');
+        $product = $this->createProduct(price: 75, stock: 2);
+        $login = $this->postJson('/api/login', [
+            'correo' => 'history@example.com',
+            'password' => 'password123',
+        ])->assertOk();
+        $token = $login->json('token');
+
+        $order = $this->withToken($token)->postJson('/api/pedidos', [
+            'items' => [['idproductos' => $product, 'cantidad' => 1]],
+        ])->assertCreated();
+
+        $this->withToken($token)->getJson('/api/mis-pedidos')
+            ->assertOk()
+            ->assertJsonPath('pedidos.0.id', $order->json('id'))
+            ->assertJsonPath('pedidos.0.items.0.precio_unitario', 75);
+        $this->assertDatabaseHas('pedidos', ['idpedidos' => $order->json('id'), 'cliente_id' => $customer]);
+    }
+
+    public function test_order_detail_returns_server_prices_for_invoice(): void
+    {
+        $product = $this->createProduct(price: 99.5, stock: 2);
+        $order = $this->postJson('/api/pedidos', [
+            'items' => [['idproductos' => $product, 'cantidad' => 2]],
+        ])->assertCreated();
+
+        $this->getJson('/api/pedidos/'.$order->json('id'))
+            ->assertOk()
+            ->assertJsonPath('items.0.precio_unitario', 99.5)
+            ->assertJsonPath('items.0.subtotal', 199);
+    }
+
+    public function test_login_is_rate_limited_after_repeated_failures(): void
+    {
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $this->postJson('/api/login', [
+                'correo' => 'rate-limit@example.com',
+                'password' => 'incorrecta',
+            ])->assertUnauthorized();
+        }
+
+        $this->postJson('/api/login', [
+            'correo' => 'rate-limit@example.com',
+            'password' => 'incorrecta',
+        ])->assertStatus(429);
     }
 
     public function test_registration_rejects_missing_fields(): void

@@ -1,7 +1,7 @@
 import { test, expect } from '../fixtures/test.js'
 import { HomePage, CartPage, CheckoutPage } from '../pages/store.pages.js'
 
-const apiBaseUrl = process.env.PLAYWRIGHT_API_URL || 'http://localhost:8000'
+const apiBaseUrl = process.env.PLAYWRIGHT_API_URL || 'http://127.0.0.1:8000'
 
 test.describe('Flujos críticos con Page Objects', () => {
   test('navega del catálogo al carrito y modifica la cantidad', async ({ cleanStore }) => {

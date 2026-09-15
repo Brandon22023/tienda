@@ -10,5 +10,5 @@ npm run test:selenium
 
 Variables opcionales:
 
-- `SELENIUM_BASE_URL`: URL del frontend, por defecto `http://localhost:5173`.
-- `SELENIUM_API_URL`: URL del backend, por defecto `http://localhost:8000`.
+- `SELENIUM_BASE_URL`: URL del frontend; se puede definir por entorno.
+- `SELENIUM_API_URL`: URL del backend; se puede definir por entorno.

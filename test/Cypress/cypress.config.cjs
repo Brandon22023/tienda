@@ -6,7 +6,7 @@ module.exports = {
   screenshotsFolder: 'results/screenshots',
   videosFolder: 'results/videos',
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL || 'http://localhost:5173',
+    baseUrl: process.env.CYPRESS_BASE_URL || 'http://127.0.0.1:5173',
     specPattern: 'e2e/**/*.cy.js',
     supportFile: 'support/e2e.js',
     retries: {

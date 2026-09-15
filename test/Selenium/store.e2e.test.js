@@ -6,8 +6,8 @@ const { Builder, By, until } = require('../../frontend/node_modules/selenium-web
 const chrome = require('../../frontend/node_modules/selenium-webdriver/chrome')
 const { visible, HomePage, CartPage, LoginPage, CheckoutPage } = require('./pages/store.pages')
 
-const BASE_URL = process.env.SELENIUM_BASE_URL || 'http://localhost:5173'
-const API_URL = process.env.SELENIUM_API_URL || 'http://localhost:8000'
+const BASE_URL = process.env.SELENIUM_BASE_URL || 'http://127.0.0.1:5173'
+const API_URL = process.env.SELENIUM_API_URL || 'http://127.0.0.1:8000'
 const RESULTS_DIR = path.resolve(__dirname, 'results')
 
 async function createDriver() {
