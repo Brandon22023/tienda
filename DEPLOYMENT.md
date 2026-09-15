@@ -10,9 +10,12 @@ servicios, cuentas ni credenciales reales.
 - Base de datos: PostgreSQL. En produccion puede ser Supabase; en local la
   proporciona `docker-compose.yml`.
 - `test/`: suites externas de PHPUnit, Playwright, Selenium y Cypress.
-- `Database/DDL.sql`: export historico de MySQL Workbench. No es la fuente de
-  verdad del runtime; las migraciones Laravel en
-  `Backend/database/migrations/` son la fuente de verdad para PostgreSQL.
+- `Database/DDL.postgresql.sql`: DDL explícito del esquema de negocio para
+  PostgreSQL/Supabase.
+- `Database/DDL.sql`: export histórico de MySQL Workbench; se conserva solo
+  como referencia de la base anterior y no debe ejecutarse en PostgreSQL.
+- Las migraciones Laravel en `Backend/database/migrations/` siguen siendo la
+  fuente de verdad del runtime y crean también las tablas internas de Laravel.
 
 El backend no depende de archivos JSON de productos ni de datos de prueba para
 la operacion normal. Los productos, categorias, clientes y pedidos viven en la
@@ -21,7 +24,11 @@ base de datos. `localStorage` conserva solo estado de experiencia del navegador
 
 ## Variables del backend
 
-Usa `Backend/.env.example` como plantilla. En Supabase/Render se deben definir
+Para desarrollo local, `Backend/.env` ya está configurado para el PostgreSQL de
+`docker-compose.yml` (`127.0.0.1:5433`). No subas ese archivo porque contiene
+valores locales.
+
+Usa `Backend/.env.example` como plantilla para otro entorno. En Supabase/Render se deben definir
 los valores reales de:
 
 ```env

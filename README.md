@@ -566,7 +566,8 @@ En el siguiente video se presenta una demostración completa del flujo de usuari
 - La aplicación detecta automáticamente el nombre de la columna de contraseña en la tabla cliente para mayor flexibilidad
 - Los archivos de log se almacenan en `Backend/storage/logs/`
 - El carrito del usuario se persiste automáticamente en el navegador mediante localStorage
-- Docker local usa PostgreSQL; `Database/DDL.sql` se conserva como export histórico de MySQL Workbench
+- Docker local usa PostgreSQL; `Database/DDL.postgresql.sql` contiene el DDL del esquema
+  de negocio y `Database/DDL.sql` se conserva como export histórico de MySQL Workbench
 - Cada componente React incluye su propio archivo CSS asociado
 
 ## Resolución de Problemas Comunes
