@@ -19,13 +19,14 @@ servicios, cuentas ni credenciales reales.
 
 El backend no depende de archivos JSON de productos ni de datos de prueba para
 la operacion normal. Los productos, categorias, clientes y pedidos viven en la
-base de datos. `localStorage` conserva solo estado de experiencia del navegador
-(carrito, checkout y la identidad que actualmente devuelve el login).
+base de datos. `localStorage` conserva únicamente el carrito, favoritos y el
+token de sesión del navegador. El resumen y la factura consultan el pedido en
+el servidor.
 
 ## Variables del backend
 
 Para desarrollo local, `Backend/.env` ya está configurado para el PostgreSQL de
-`docker-compose.yml` (`127.0.0.1:5433`). No subas ese archivo porque contiene
+`docker-compose.yml` (puerto local 5433). No subas ese archivo porque contiene
 valores locales.
 
 Usa `Backend/.env.example` como plantilla para otro entorno. En Supabase/Render se deben definir
@@ -105,9 +106,9 @@ los productos si la tabla esta vacia porque Compose establece
 
 URLs locales:
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:8000`
-- PostgreSQL: `localhost:5433`
+- Frontend: URL publicada por el servicio web
+- Backend: URL publicada por el servicio API
+- PostgreSQL: puerto local 5433 durante desarrollo
 
 Para una carga manual o una comprobacion:
 
@@ -135,7 +136,7 @@ php artisan db:seed
 ```
 
 Las variables locales de los runners de pruebas pueden seguir usando SQLite y
-URLs localhost; son configuracion de pruebas, no defaults del bundle de
+URLs de pruebas; son configuración de pruebas, no defaults del bundle de
 produccion.
 
 ## Compatibilidad MySQL -> PostgreSQL
@@ -148,9 +149,8 @@ reales y revisar cualquier dato historico que provenga del DDL de Workbench.
 
 ## Limites conocidos antes de produccion
 
-- El login actual no emite token ni sesion segura; la identidad se conserva en
-  `localStorage`. Antes de exponer pedidos a usuarios reales se debe agregar
-  autenticacion/autorizacion del lado servidor.
+- El login emite un token Bearer y el backend lo valida para pedidos asociados
+  e historial. El carrito y favoritos siguen siendo estado de navegador.
 - El pago con tarjeta solo valida datos localmente; no existe una pasarela real.
 - El almacenamiento de sesiones/cache en archivo es adecuado para este MVP de
   una instancia, pero debe cambiarse a un servicio compartido si se escala.

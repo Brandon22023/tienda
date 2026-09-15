@@ -14,9 +14,10 @@ despliegue. No se incluyen credenciales ni dominios reales.
 ## Características Principales
 
 - Catálogo de productos con filtrado por categoría y precio
+- Búsqueda de productos y lista de favoritos
 - Sistema de autenticación de usuarios con registro y login
 - Carrito de compras persistente en localStorage
-- Gestión completa de pedidos
+- Compra como invitado o con cuenta, con historial de pedidos
 - Integración con mapas interactivos mediante Leaflet
 - API RESTful con validación de entrada
 - Base de datos relacional con integridad referencial
@@ -103,7 +104,7 @@ cd Backend
 php artisan serve
 ```
 
-El servidor estará disponible en `http://localhost:8000`
+El servidor estará disponible en la URL configurada para el backend.
 
 **Terminal 2 - Frontend:**
 
@@ -112,7 +113,7 @@ cd frontend
 npm run dev
 ```
 
-El servidor estará disponible en `http://localhost:5173`
+El servidor estará disponible en la URL configurada para el frontend.
 
 ## CI/CD En GitHub
 
@@ -285,6 +286,7 @@ Autentica un usuario existente.
 ```json
 {
   "message": "Autenticado",
+  "token": "token_de_sesion",
   "cliente_id": 1,
   "nombre": "Juan Perez",
   "correo": "juan@example.com",
@@ -304,7 +306,8 @@ Autentica un usuario existente.
 
 #### POST `/api/pedidos`
 
-Crea un nuevo pedido en el sistema.
+Crea un nuevo pedido en el sistema. Puede utilizarse como invitado. Si se
+envía un token Bearer válido, el pedido se asocia al cliente autenticado.
 
 **Parámetros:**
 
@@ -329,42 +332,17 @@ Crea un nuevo pedido en el sistema.
 }
 ```
 
-#### POST `/api/pedidos/{id}/detalles`
+#### GET `/api/pedidos/{id}`
 
-Añade items de productos a un pedido existente.
+Devuelve el pedido y sus líneas con los precios calculados por el servidor.
+Este endpoint es la fuente utilizada por el resumen y la factura.
 
-**Parámetros:**
+#### GET `/api/mis-pedidos`
 
-```json
-{
-  "items": [
-    {
-      "idproductos": 1,
-      "cantidad": 2,
-      "precio_unitario": 899.99
-    },
-    {
-      "idproductos": 5,
-      "cantidad": 1,
-      "precio_unitario": 150.0
-    }
-  ]
-}
-```
+Devuelve el historial del cliente autenticado. Requiere el encabezado:
 
-**Validaciones:**
-
-- items: requerido, array
-- idproductos: requerido, entero
-- cantidad: requerido, entero
-- precio_unitario: requerido, numérico
-
-**Respuesta exitosa (201):**
-
-```json
-{
-  "inserted": 2
-}
+```http
+Authorization: Bearer token_de_sesion
 ```
 
 ## Arquitectura Frontend
@@ -376,6 +354,7 @@ Añade items de productos a un pedido existente.
 - Gestiona enrutamiento general
 - Mantiene estado global del carrito
 - Gestiona información del cliente autenticado
+- Gestiona búsqueda y favoritos
 - Realiza llamadas iniciales a la API
 
 **Catalogo.jsx** - Catálogo de productos
@@ -443,7 +422,9 @@ El carrito se persiste en `localStorage` con la clave `cart` como un array de ob
 ];
 ```
 
-La información del cliente se mantiene en el estado de React durante la sesión activa.
+El token de sesión se conserva para autorizar pedidos e historial. La factura
+consulta directamente el pedido del servidor por su identificador y no utiliza
+datos de productos, precios o totales guardados en el navegador.
 
 Los datos de productos se cargan una única vez desde la API al iniciar la aplicación.
 
@@ -497,9 +478,13 @@ La API backend incluye pruebas externas en [test/Feature/ApiFlowTest.php](test/F
 ### Qué validan
 
 - `login success`: autentica un cliente con credenciales válidas.
+- `login rate limit`: limita intentos repetidos de autenticación.
 - `login fail`: rechaza credenciales incorrectas.
 - `get productos`: devuelve productos desde `/api/catalogo`.
-- `add carrito`: inserta los detalles de un pedido en `/api/pedidos/{id}/detalles`.
+- `get order detail`: devuelve precios server-side para la factura.
+- `customer order history`: devuelve únicamente los pedidos del cliente autenticado.
+- `guest impersonation`: impide asociar un pedido invitado a otra cuenta.
+- `order detail`: devuelve las líneas del pedido con el precio server-side.
 - `total carrito`: guarda el total enviado al crear el pedido.
 - `crear pedido`: crea un pedido nuevo en `/api/pedidos`.
 
@@ -566,6 +551,9 @@ En el siguiente video se presenta una demostración completa del flujo de usuari
 - La aplicación detecta automáticamente el nombre de la columna de contraseña en la tabla cliente para mayor flexibilidad
 - Los archivos de log se almacenan en `Backend/storage/logs/`
 - El carrito del usuario se persiste automáticamente en el navegador mediante localStorage
+- Las compras invitadas no requieren registro.
+- Las compras con cuenta utilizan un token Bearer y aparecen en el historial.
+- La factura se construye con el detalle y total que devuelve el servidor.
 - Docker local usa PostgreSQL; `Database/DDL.postgresql.sql` contiene el DDL del esquema
   de negocio y `Database/DDL.sql` se conserva como export histórico de MySQL Workbench
 - Cada componente React incluye su propio archivo CSS asociado
@@ -611,8 +599,8 @@ Desde la carpeta raíz:
 docker compose up --build
 ```
 
-PostgreSQL is exposed on `localhost:5433` by default to avoid conflicts with
-an existing local database. To use another host port in PowerShell, set
+PostgreSQL is exposed on port `5433` by default to avoid conflicts with an
+existing database. To use another host port in PowerShell, set
 `$env:POSTGRES_PORT` before starting Compose:
 
 ```powershell
@@ -620,7 +608,7 @@ $env:POSTGRES_PORT = "5434"
 docker compose up --build
 ```
 
-Frontend: `http://localhost:5173` · API: `http://localhost:8000`.
+Frontend y API: consulta las URLs definidas por tu entorno.
 
 Los productos iniciales se cargan automáticamente al iniciar el backend si la tabla está vacía. Para forzar una carga manual:
 

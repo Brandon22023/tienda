@@ -1,7 +1,7 @@
 # Informe QA — Electrocore
 
 Fecha de ejecución: 2026-09-12  
-Entorno: Windows 11 x64, Docker Desktop, frontend en `http://localhost:5173`, backend en `http://localhost:8000`, PostgreSQL 16 en `localhost:5433`.
+Entorno: Windows 11 x64, Docker Desktop, frontend y backend configurados mediante variables de entorno, PostgreSQL 16 en el puerto 5433.
 
 ## Resumen ejecutivo
 
@@ -38,23 +38,23 @@ Playwright generó HTML, trazas, videos y capturas bajo `test/Playwright/results
 - API negativa: credenciales inválidas, campos ausentes, cliente/producto inexistente, cantidades inválidas, duplicados, carrito vacío e inventario insuficiente.
 - CI con backend, frontend y job de navegadores.
 
-No se encontraron rutas implementadas para historial/detalle de pedidos, administración, roles, logout del servidor o autorización de recursos. Esas áreas quedan como N/A del producto actual, no como funcionalidades verificadas.
+Se verificaron rutas para detalle de pedidos, historial de clientes, logout del servidor y autorización mediante token. La compra como invitado permanece habilitada.
 
 ## Hallazgos
 
-### BUG-001 — Alta — Falta autenticación y autorización del lado servidor
+### BUG-001 — Resuelto — Autenticación y autorización del lado servidor
 
-`POST /api/login` solo devuelve datos del cliente y el frontend los guarda en `localStorage`; no se emite token/sesión. `POST /api/pedidos` acepta `cliente_id` recibido por el consumidor y permite `null` para invitados. Un cliente puede enviar el ID de otro cliente, porque no existe middleware que vincule la identidad autenticada con el pedido.
+`POST /api/login` emite un token Bearer almacenado como hash en la tabla de clientes. Los pedidos invitados permiten `null`; los pedidos autenticados se asocian al cliente del token y no al `cliente_id` enviado por el navegador.
 
 Evidencia: `Backend/routes/api.php`, `Backend/app/Http/Controllers/LoginController.php`, `Backend/app/Http/Controllers/OrderController.php`, `frontend/src/components/pago.jsx`.
 
-Recomendación: implementar Sanctum/JWT o sesión segura, proteger las rutas, obtener el cliente desde la identidad autenticada y permitir invitados mediante un flujo explícito separado.
+Implementado mediante `CustomerToken`, endpoints de logout e historial, conservando el flujo explícito de invitado.
 
-### BUG-002 — Media — Una categoría inexistente muestra todos los productos
+### BUG-002 — Resuelto — Una categoría inexistente muestra todos los productos
 
-En `frontend/src/components/vistacatalogo.jsx`, cuando no hay coincidencias se asigna `encontrados = all`. La URL `/categoria-inexistente` termina mostrando el catálogo completo en lugar de un estado vacío o un 404.
+La categoría inexistente ahora conserva una lista vacía y muestra el estado “No hay productos en esta categoría”.
 
-Recomendación: eliminar el fallback, mostrar “No hay productos en esta categoría” y, si aplica, validar el slug contra un catálogo de categorías.
+Implementado eliminando el fallback al catálogo completo.
 
 ### BUG-003 — Media — El carrito permite superar el inventario disponible
 
@@ -62,20 +62,20 @@ Recomendación: eliminar el fallback, mostrar “No hay productos en esta catego
 
 Recomendación: exponer stock en el contrato de catálogo, limitar el control `+`, mostrar disponibilidad y conservar la validación definitiva en el backend.
 
-### BUG-004 — Media — `/pago` puede abrirse sin carrito
+### BUG-004 — Resuelto — `/pago` puede abrirse sin carrito
 
-La navegación directa a `/pago` con `orderInfo` pero sin `cart` muestra “No hay artículos en el carrito”, total `Q 0.00` y permite intentar enviar el pedido; el backend termina devolviendo 422. La prueba manual en navegador reprodujo este estado.
+La navegación directa a `/pago` conserva el resumen vacío, pero el frontend ahora bloquea el envío y muestra un mensaje accionable cuando no hay artículos.
 
-Recomendación: proteger la ruta, validar carrito y datos antes de mostrar pago, y redirigir a carrito/pedido con un mensaje accionable.
+Implementado con validación de datos del pedido y carrito antes de crear la orden.
 
-### GAP-001 — Baja — Búsqueda, favoritos y enlaces secundarios no tienen comportamiento
+### GAP-001 — Parcialmente resuelto — Búsqueda, favoritos y enlaces secundarios
 
-Los controles visuales de búsqueda y favoritos no ejecutan una acción, y varios enlaces secundarios apuntan a `#`. Si forman parte del alcance comercial, deben convertirse en historias funcionales y cubrirse con pruebas.
+La búsqueda y favoritos ya funcionan y tienen pruebas frontend. Los enlaces secundarios que todavía apuntan a `#` quedan fuera del alcance de este cambio.
 
 ## Riesgos no cubiertos por el producto actual
 
 - No hay pasarela de pago real; el flujo de tarjeta solo valida formato y guarda información en el navegador.
-- No hay consulta de pedidos para comprobar visibilidad por usuario.
+- El historial de pedidos requiere una cuenta y token Bearer; los pedidos invitados solo se consultan mediante el identificador generado para su resumen.
 - No hay operaciones administrativas ni permisos por rol.
 - No se pudo hacer una prueba de carga/estrés ni un escaneo DAST en este ciclo.
 
