@@ -23,6 +23,9 @@ describe('Carrito - Cypress', () => {
     cy.request({
       method: 'POST',
       url: '/api/pedidos',
+      headers: {
+        Accept: 'application/json'
+      },
       body: { cliente_id: null, items: [] },
       failOnStatusCode: false
     }).its('status').should('eq', 422)
