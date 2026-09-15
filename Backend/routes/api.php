@@ -32,4 +32,7 @@ Route::get('/catalogo/menor', fn () => response()->json(['productos' => $catalog
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [LoginController::class, 'login']);
+Route::post('/logout', [LoginController::class, 'logout']);
 Route::post('/pedidos', [OrderController::class, 'store']);
+Route::get('/pedidos/{id}', [OrderController::class, 'show'])->whereNumber('id');
+Route::get('/mis-pedidos', [OrderController::class, 'mine']);
